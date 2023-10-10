@@ -18,7 +18,8 @@ window.fetchWorks = async (query, fromYear, toYear) => {
 	const response = await fetch(
           "https://api.openalex.org/works?" + new URLSearchParams({
 	    filter: filters.join(","),
-	    select: "id,title,publication_year,primary_location,authorships,concepts,locations,grants,referenced_works",
+	    sort: 'cited_by_count:desc',
+	    select: "id,title,publication_year,primary_location,authorships,concepts,locations,grants,referenced_works,cited_by_count",
             mailto: `****@****.com`,
             "per-page": perPage,
 	    page: i+1,
