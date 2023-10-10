@@ -1,0 +1,6 @@
+- [ ] Create graph in graphology
+- [ ] Show graph with sigma
+- [ ] UI details, download of .gefx, etc...
+- [ ] Get more data from the OpenAlex API? Maybe...
+- [ ] Save and replay specific corpus
+- [ ] Implement a little search syntax

@@ -1,0 +1,24 @@
+{
+  "name": "bibliograph2",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "mkdir dist && esbuild --bundle --sourcemap --minify --loader:.html=copy --outdir=dist --define:window.IS_PRODUCTION=true src/index.js src/index.html && gzip -fk dist/index.js",
+    "dev": "esbuild --bundle --sourcemap --loader:.html=copy --outdir=dist --watch --servedir=dist --serve=127.0.0.1:8000 src/index.js src/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "hello"
+  },
+  "author": "Nils Bonfils",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "0.19.4"
+  },
+  "dependencies": {
+    "@ajusa/lit": "^1.1.0",
+    "alpinejs": "^3.13.0"
+  }
+}

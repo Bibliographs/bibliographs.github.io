@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#000000" />
+    <link defer rel="shortcut icon" href="static/favicon.ico" type="image/x-icon" />
+    <link defer rel="icon" href="static/favicon.ico" type="image/x-icon" />
+    <link defer rel="apple-touch-icon" href="static/apple-touch-icon.png" />
+    <!-- <link defer rel="manifest" href="manifest.json" /> -->
+    <link defer rel="stylesheet" href="index.css" />
+    <script defer type="text/javascript" src="index.js"></script>
+    <title>Bibliograph 2</title>
+  </head>
+  <body x-data="App">
+    
+    <div x-effect="console.log('works', works)"></div>
+    <div x-effect="console.log('data', data); console.log('numrefs:', data.refs ? Object.keys(data.refs).length : 0)"></div>
+    <div x-effect="console.log('filters', filters)"></div>
+    <div x-effect="console.log('filteredData', filteredData)"></div>
+
+    
+    <!-- LOADING -->
+    <template x-if="state == 'loading'">
+      <main class="c" >
+	<h1 class="center" >Loading</h1>
+	<h4 class="center" x-text="loadingMsg"></h4>
+      </main>
+    </template>
+
+    
+    <!-- INIT -->
+    <template x-if="state == 'init'">
+      <main class="c" >
+	<h1 class="center" >Bibliograph 2</h1>
+	<p>
+	  Bibliograph allows you turn a corpus of scientometrics
+	  records from OpenAlex into a landscape of bibliographic
+	  coupling. Such a landscape consists in:
+	</p>
+	<ol>
+	  <li>
+	    A base map network of references co-occurring in the records
+	    of the corpus - weighted by the frequency of their
+	    co-occurrence;</li>
+	  <li>
+	    A layer of metadata extracted from the records
+	    (e.g. authors, subject areas, keywords) and positioned in
+	    the graph according to their co-occurrence with the
+	    references of the base map.</li>
+	</ol>
+	<p>
+	  Search for your corpus, choose the period you want to
+	  investigate, refine your corpus, select the filtering
+	  thresholds and explore your bibliographic landscape.
+	</p>
+	<br />
+	<div>
+	  <div>
+	    <label for="query" >
+	      Search for words in works' title, abstract and full-text
+	    </label>
+	    <input id="query"
+		   class="card w-100"
+		   placeholder="Type words to be searched in works"
+		   type="search"
+		   x-model="query" />
+	  </div>
+	  <div>
+            <span>Only select works published between</span>
+            <input
+	      id="from-year"
+	      class="card"
+              type="number"
+	      x-model="fromYear" />
+            <span>and</span>
+	    <input
+	      id="to-year"
+	      class="card"
+              type="number"
+	      x-model="toYear" />
+	  </div>
+	  <button class="btn primary"
+		  @click="
+			 loading('corpus', 'Fetching corpus from OpenAlex API');
+			 ({count, works} = await fetchWorks(query, fromYear, toYear));
+			 done();
+			 " >
+	    Fetch Corpus
+	  </button>
+	</div>
+      </main>
+    </template>
+
+    
+    <!-- CORPUS -->
+    <template x-if="state == 'corpus'">
+      <main class="c">
+	<div x-show="count > (maxFetch * perPage)" class="corpus-too-big">
+	  <div>
+	    <p>There are more than <strong x-text="maxFetch * perPage">10000</strong> works with this search query</p>
+	    <label for="query" >
+	      Please refine your search query:
+	    </label>
+	    <input id="query"
+		   class="card w-100"
+		   placeholder="Type words to be searched in works"
+		   type="search"
+		   x-model="query" />
+	  </div>
+	  <div>
+            <span>Only select works published between</span>
+            <input
+	      id="from-year"
+	      class="card"
+              type="number"
+	      x-model="fromYear" />
+            <span>and</span>
+	    <input
+	      id="to-year"
+	      class="card"
+              type="number"
+	      x-model="toYear" />
+	  </div>
+	  <button class="btn primary"
+		  @click="
+			 loading('corpus', 'Fetching corpus from OpenAlex API');
+			 ({count, works} = await fetchWorks(query, fromYear, toYear));
+			 done();
+			 " >
+	    Fetch Corpus
+	  </button>
+	</div>
+
+	<h2>Refine Corpus (functionality not yet implemented)</h2>
+	<p>This section is supposed to let you search for works and remove undesired entries.</p>
+	<p x-show="count > (maxFetch * perPage)" style="color: red">
+	  The corpus is too big to be fetched is too big. It has a
+	  total of <strong x-text="count"></strong> works and <strong x-text="count - works.length"></strong>
+	  were not included in the current corpus.
+	  <br/>
+	  The maximum amount of works was fetched.
+	</p>
+	<p>The current corpus contains <strong x-text="works.length"></strong> works</p>
+	<div>
+	  <button class="btn primary"
+		  @click="
+			 loading('filters');
+			 data = processWorks(works);
+			 filters = getFilters(data);
+			 done();
+			 ">
+	  Validate corpus
+	  </button>
+	  <span x-show="count > (maxFetch * perPage)" style="color: red">Incomplete corpus!</span>
+	</div>
+	<div>
+	  <p>Sample of the corpus:</p>
+	  <table>
+	    <thead>
+	      <td>id</td>
+	      <td>year</td>
+	      <td>title</td>
+	      <td>publisher</td>
+	      <td>authors</td>
+	    </thead>
+	    <template x-for="entry in works.slice(0, 10)">
+	      <tr>
+		<td x-text="entry.id"></td>
+		<td x-text="entry.publication_year"></td>
+		<td x-text="entry.title"></td>
+		<td>
+		  [<span x-text="entry.primary_location.source?.type"></span>] 
+		  <span x-text="entry.primary_location.source?.display_name"></span>
+		</td>
+		<td x-text="entry.authorships.map((author) => author.author.display_name).join(',')"></td>
+	      </tr>
+	    </template>
+	  </table>
+	</div>
+      </main>
+    </template>
+
+
+    <!-- FILTERS -->
+    <template x-if="state == 'filters'">
+      <main class="c Filters" >
+	<h2>Filters</h2>
+	<p>
+          Use the sliders to chose how many nodes of each type should be included
+          in your network based on the number of records in which they appears. It
+          is strongly recommended NOT to include the references occurring in one
+          record only.
+	</p>
+	
+	<div class="fields" >
+	  <template x-for="[field, filter] in Object.entries(filters)">
+	    <div>
+	      <h4 x-text="field"></h4>
+              <div>
+		Keep the <strong x-text="filter.counts[filter.value]"></strong> 
+		<span x-text="field"></span> occurring in at
+		least <strong x-text="filter.lowerBounds[filter.value]"></strong> records
+	      </div>
+              <div>
+		<span style="float: left">0</span>
+		<span style="float: right" x-text="filter.counts.at(-1)"></span>
+	      </div>
+	      <input type="range"
+		     min="0"
+		     :max="filter.counts.length - 1"
+		     x-model="filter.value" />
+	    </div>
+	  </template>
+	</div>
+	<button class="btn primary"
+		@click="
+		       loading('visualization');
+		       filteredData = filterData(data, filters);
+		       done();">
+	  Visualize Results
+	</button>
+      </main>
+    </template>
+
+
+    <!-- VISUALIZATION -->
+    <template x-if="state == 'visualization'">
+      <main class="c">
+	<h2 class="center">Not Implemented Yet</h2>
+      </main>
+    </template>
+  </body>
+</html>

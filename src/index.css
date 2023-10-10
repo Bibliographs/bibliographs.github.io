@@ -1,0 +1,26 @@
+.center {
+    text-align: center;
+}
+
+.corpus-too-big {
+    border: red 2px solid;
+    border-radius: 5px;
+    background-color: lightpink;
+    padding: 5px;
+}
+
+.Filters .fields {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.Filters .fields > div {
+  width: calc(50% - 1em);
+}
+.Filters .fields > div:nth-child(even) {
+  margin-right: 2em;
+}
+.Filters .fields input[type="range"] {
+  width: 100%;
+}
