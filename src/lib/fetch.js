@@ -12,7 +12,8 @@ window.fetchWorks = async (query, fromYear, toYear) => {
     filters.push(`to_publication_date:${toYear}-12-31`);
     filters.push(`default.search:${query}`);
 
-    await Promise.all([...Array(maxFetch).keys()].map(async (i) => {
+    works = await Promise.all([...Array(maxFetch).keys()].map(async (i) => {
+      let data = {};
       try {
 	const response = await fetch(
           "https://api.openalex.org/works?" + new URLSearchParams({
@@ -25,13 +26,14 @@ window.fetchWorks = async (query, fromYear, toYear) => {
 	if (!response.ok) {
 	  throw new Error("Network response was not OK");
 	}
-	const data = await response.json();
+	data = await response.json();
 	count = data.meta.count;
-	works = works.concat(data.results);
       } catch (e) {
 	console.error(`Error while fetching works:\n\t${e}`);
       }
+      return data.results;
     }));
+    works = works.flat();
   }
   
   return {count, works};
