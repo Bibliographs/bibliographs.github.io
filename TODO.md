@@ -1,6 +1,9 @@
 - [ ] Create graph in graphology
-- [ ] Show graph with sigma
 - [ ] UI details, download of .gefx, etc...
-- [ ] Get more data from the OpenAlex API? Maybe...
 - [ ] Save and replay specific corpus
 - [ ] Implement a little search syntax
+- [ ] Setup github pages with GA
+- [ ] Get infos from top 1000 refs for the refs labels
+
+Not prio:
+- [ ] Show graph with sigma
