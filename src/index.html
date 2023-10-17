@@ -82,10 +82,19 @@
               type="number"
 	      x-model="toYear" />
 	  </div>
+	  <div>
+	    <span>Fetch a corpus of up to</span>
+	    <input
+	      id="max-fetch"
+	      class="card"
+              type="number"
+	      x-model="maxWorks" />
+	    <span>most cited works</span>
+	  </div>
 	  <button class="btn primary"
 		  @click="
 			 loading('corpus', 'Fetching corpus from OpenAlex API');
-			 ({count, works} = await fetchWorks(query, fromYear, toYear));
+			 ({count, works} = await fetchWorks(query, fromYear, toYear, maxWorks));
 			 done();
 			 " >
 	    Fetch Corpus
@@ -98,9 +107,9 @@
     <!-- CORPUS -->
     <template x-if="state == 'corpus'">
       <main class="c">
-	<div x-show="count > (maxFetch * perPage)" class="corpus-too-big">
+	<div x-show="count > maxWorks" class="corpus-too-big">
 	  <div>
-	    <p>There are more than <strong x-text="maxFetch * perPage">10000</strong> works with this search query</p>
+	    <p>There are more than <strong x-text="maxWorks">10000</strong> works with this search query</p>
 	    <label for="query" >
 	      Please refine your search query:
 	    </label>
@@ -127,7 +136,7 @@
 	  <button class="btn primary"
 		  @click="
 			 loading('corpus', 'Fetching corpus from OpenAlex API');
-			 ({count, works} = await fetchWorks(query, fromYear, toYear));
+			 ({count, works} = await fetchWorks(query, fromYear, toYear, maxWorks));
 			 done();
 			 " >
 	    Fetch Corpus
@@ -136,7 +145,7 @@
 
 	<h2>Refine Corpus (functionality not yet implemented)</h2>
 	<p>This section is supposed to let you search for works and remove undesired entries.</p>
-	<p x-show="count > (maxFetch * perPage)" style="color: red">
+	<p x-show="count > maxWorks" style="color: red">
 	  The corpus is too big to be fetched is too big. It has a
 	  total of <strong x-text="count"></strong> works and <strong x-text="count - works.length"></strong>
 	  were not included in the current corpus.
@@ -154,7 +163,7 @@
 			 ">
 	  Validate corpus
 	  </button>
-	  <span x-show="count > (maxFetch * perPage)" style="color: red">Incomplete corpus!</span>
+	  <span x-show="count > maxWorks" style="color: red">Incomplete corpus!</span>
 	</div>
 	<div>
 	  <p>Sample of the corpus:</p>

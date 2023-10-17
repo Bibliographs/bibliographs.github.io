@@ -11,6 +11,7 @@ Alpine.data('App', () => ({
   query: '',
   fromYear: 1900,
   toYear: 2100,
+  maxWorks: 10000,
   state: 'init',
   nextState: '',
   loadingMsg: '',

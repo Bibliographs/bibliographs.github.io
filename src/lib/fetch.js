@@ -1,18 +1,18 @@
-window.maxFetch = 5;
 window.perPage = 200;
 
-window.fetchWorks = async (query, fromYear, toYear) => {
+window.fetchWorks = async (query, fromYear, toYear, maxWorks) => {
   let works = [];
   let count = 0;
   
   if (query !== "") {
     const filters = [];
+    const numReq = Math.ceil(maxWorks / perPage);
 
     filters.push(`from_publication_date:${fromYear}-01-01`);
     filters.push(`to_publication_date:${toYear}-12-31`);
     filters.push(`default.search:${query}`);
 
-    works = await Promise.all([...Array(maxFetch).keys()].map(async (i) => {
+    works = await Promise.all([...Array(numReq).keys()].map(async (i) => {
       let data = {};
       try {
 	const response = await fetch(
@@ -34,7 +34,8 @@ window.fetchWorks = async (query, fromYear, toYear) => {
       }
       return data.results;
     }));
-    works = works.flat();
+
+    works = works.flat().slice(0, maxWorks);
   }
   
   return {count, works};
