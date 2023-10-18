@@ -12,7 +12,7 @@ Alpine.data('App', () => ({
   fromYear: 1900,
   toYear: 2100,
   maxWorks: 10000,
-  state: 'init',
+  state: 'search',
   nextState: '',
   loadingMsg: '',
   count: 0,

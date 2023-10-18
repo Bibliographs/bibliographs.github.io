@@ -31,8 +31,8 @@
     </template>
 
     
-    <!-- INIT -->
-    <template x-if="state == 'init'">
+    <!-- SEARCH -->
+    <template x-if="state == 'search'">
       <main class="c" >
 	<h1 class="center" >Bibliograph 2</h1>
 	<p>
@@ -57,7 +57,10 @@
 	  thresholds and explore your bibliographic landscape.
 	</p>
 	<br />
-	<div>
+	<form @submit.prevent="
+			       loading('corpus', 'Fetching corpus from OpenAlex API');
+			       ({count, works} = await fetchWorks(query, fromYear, toYear, maxWorks));
+			       done();" >
 	  <div>
 	    <label for="query" >
 	      Search for words in works' title, abstract and full-text
@@ -88,18 +91,15 @@
 	      id="max-fetch"
 	      class="card"
               type="number"
+	      min="1"
+	      max="100000"
 	      x-model="maxWorks" />
 	    <span>most cited works</span>
 	  </div>
-	  <button class="btn primary"
-		  @click="
-			 loading('corpus', 'Fetching corpus from OpenAlex API');
-			 ({count, works} = await fetchWorks(query, fromYear, toYear, maxWorks));
-			 done();
-			 " >
+	  <button class="btn primary" >
 	    Fetch Corpus
 	  </button>
-	</div>
+	</form>
       </main>
     </template>
 
