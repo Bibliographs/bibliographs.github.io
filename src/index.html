@@ -108,38 +108,13 @@
     <template x-if="state == 'corpus'">
       <main class="c">
 	<div x-show="count > maxWorks" class="corpus-too-big">
-	  <div>
 	    <p>There are more than <strong x-text="maxWorks">10000</strong> works with this search query</p>
-	    <label for="query" >
-	      Please refine your search query:
-	    </label>
-	    <input id="query"
-		   class="card w-100"
-		   placeholder="Type words to be searched in works"
-		   type="search"
-		   x-model="query" />
-	  </div>
-	  <div>
-            <span>Only select works published between</span>
-            <input
-	      id="from-year"
-	      class="card"
-              type="number"
-	      x-model="fromYear" />
-            <span>and</span>
-	    <input
-	      id="to-year"
-	      class="card"
-              type="number"
-	      x-model="toYear" />
-	  </div>
-	  <button class="btn primary"
-		  @click="
-			 loading('corpus', 'Fetching corpus from OpenAlex API');
-			 ({count, works} = await fetchWorks(query, fromYear, toYear, maxWorks));
-			 done();
-			 " >
-	    Fetch Corpus
+	    <p>
+	      Please go back to refine your search query.
+	    </p>
+
+	  <button class="btn primary" @click="state = 'search';" >
+	    Go back to Search step
 	  </button>
 	</div>
 
