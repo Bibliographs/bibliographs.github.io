@@ -3,9 +3,13 @@ import './index.css';
 
 import Alpine from 'alpinejs';
 
-import './lib/fetch.js';
-import './lib/processing.js';
+import { fetchWorks } from './lib/fetch.js';
+import { processWorks, getFilters, filterData } from './lib/processing.js';
 
+window.fetchWorks = fetchWorks;
+window.processWorks = processWorks;
+window.getFilters = getFilters;
+window.filterData = filterData;
 
 Alpine.data('App', () => ({
   query: '',

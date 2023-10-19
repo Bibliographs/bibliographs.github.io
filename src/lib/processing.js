@@ -10,7 +10,7 @@ const fields = [
 
 const incOrCreate = (obj, key) => { obj[key] = (obj[key] || 0) + 1; };
 
-window.processWorks = (works) => {
+export const processWorks = (works) => {
   let data = fields.reduce((acc, curr) => {acc[curr] = {}; return acc;}, {});
 
   works.forEach((work) => {
@@ -52,7 +52,7 @@ window.processWorks = (works) => {
   return data;
 };
 
-window.getFilters = (data) => {
+export const getFilters = (data) => {
   let filters = fields.reduce((acc, curr) => {acc[curr] = {}; return acc;}, {});
 
   fields.forEach((field) => {
@@ -77,7 +77,7 @@ window.getFilters = (data) => {
   return filters;
 };
 
-window.filterData = (data, filters) => {
+export const filterData = (data, filters) => {
   let filteredData = {};
   fields.forEach((field) => {
     let threshold = filters[field].lowerBounds[filters[field].value];

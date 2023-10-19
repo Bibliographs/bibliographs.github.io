@@ -1,6 +1,6 @@
 window.perPage = 200;
 
-window.fetchWorks = async (query, fromYear, toYear, maxWorks) => {
+export const fetchWorks = async (query, fromYear, toYear, maxWorks) => {
   let works = [];
   let count = 0;
   
