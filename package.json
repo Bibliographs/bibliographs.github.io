@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "@ajusa/lit": "^1.1.0",
-    "alpinejs": "^3.13.0"
+    "alpinejs": "^3.13.0",
+    "graphology": "0.25.4",
+    "graphology-gexf": "0.11.0"
   }
 }

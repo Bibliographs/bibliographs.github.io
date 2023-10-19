@@ -203,6 +203,7 @@
 		@click="
 		       loading('visualization');
 		       filteredData = filterData(data, filters);
+		       graph = generateGraph(filteredData);
 		       done();">
 	  Visualize Results
 	</button>
@@ -213,7 +214,11 @@
     <!-- VISUALIZATION -->
     <template x-if="state == 'visualization'">
       <main class="c">
-	<h2 class="center">Not Implemented Yet</h2>
+	<a class="btn"
+	   :href="generateGexfURL(graph)"
+	   download="graph.gexf">
+	  Download .gexf file
+	</a>
       </main>
     </template>
   </body>
