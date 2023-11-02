@@ -18,7 +18,7 @@ export const processWorks = (works) => {
       incOrCreate(data.refs, ref, 'count');
     });
     
-    work.primary_location.source &&
+    work.primary_location?.source &&
       incOrCreate(data.sources, work.primary_location.source.id, 'count');
 
     // Use Sets to count each country and institution mentionned ONLY ONCE per work
