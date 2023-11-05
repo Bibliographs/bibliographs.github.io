@@ -12,11 +12,15 @@ const incOrCreate = (obj, key, subkey=false) => {
 export const processWorks = (works) => {
   // Empty objects for each fields
   let data = fields.reduce((acc, curr) => {acc[curr] = {}; return acc;}, {});
+  data.cocitedRefs = [];
 
   works.forEach((work) => {
     work.referenced_works.forEach((ref) => {
       incOrCreate(data.refs, ref, 'count');
     });
+
+    // Create sets of co-cited references (one per work)
+    data.cocitedRefs.push(new Set(work.referenced_works));
     
     work.primary_location?.source &&
       incOrCreate(data.sources, work.primary_location.source.id, 'count');
@@ -80,9 +84,13 @@ export const getFilters = (data) => {
 
 export const filterData = (data, filters) => {
   let filteredData = {};
-  fields.forEach((field) => {
-    let threshold = filters[field].lowerBounds[filters[field].value];
-    filteredData[field] = Object.fromEntries(Object.entries(data[field]).filter(([, {count}]) => count >= threshold));
+  Object.keys(data).forEach((key) => {
+    if (fields.includes(key)) {
+      let threshold = filters[key].lowerBounds[filters[key].value];
+      filteredData[key] = Object.fromEntries(Object.entries(data[key]).filter(([, {count}]) => count >= threshold));
+    } else {
+      filteredData[key] = data[key];
+    }
   });
   return filteredData;
 };
