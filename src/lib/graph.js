@@ -67,13 +67,18 @@ export const generateGraph = (data) => {
 
   console.time('force atlas');
   circular.assign(graph);
-  const positions = forceAtlas2.assign(graph, {
-    iterations: 1000,
+  forceAtlas2.assign(graph, {
+    iterations: 500,
     settings: forceAtlas2.inferSettings(graph),
   });
   console.timeEnd('force atlas');
 
+  // Fix the refs nodes in place (final position for refs)
+  graph.forEachNode((nodeRef) => graph.mergeNodeAttributes(nodeRef, {fixed: true}));
+
   graph.setAttribute('datasource', 'OpenAlex');
+  graph.setAttribute('workscount', Object.keys(data.sets.refs).lenght);
+
   return graph;
 };
 
