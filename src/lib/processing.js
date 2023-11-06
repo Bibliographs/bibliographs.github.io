@@ -1,4 +1,4 @@
-import { fields } from './graph.js';
+import { fields, metadataFields } from './graph.js';
 
 const incOrCreate = (obj, key, subkey=false) => {
   if (subkey) {
@@ -11,45 +11,52 @@ const incOrCreate = (obj, key, subkey=false) => {
 
 export const processWorks = (works) => {
   // Empty objects for each fields
-  let data = fields.reduce((acc, curr) => {acc[curr] = {}; return acc;}, {});
-  data.cocitedRefs = [];
+  const data = fields.reduce((acc, curr) => {acc[curr] = {}; return acc;}, {});
+  data.sets = fields.reduce((acc, curr) => {acc[curr] = {}; return acc;}, {});
 
   works.forEach((work) => {
+    // Create empty sets for each field
+    for (const field of Object.keys(data.sets)) {
+      data.sets[field][work.id] = new Set();
+    }
+
     work.referenced_works.forEach((ref) => {
       incOrCreate(data.refs, ref, 'count');
     });
-
-    // Create sets of co-cited references (one per work)
-    data.cocitedRefs.push(new Set(work.referenced_works));
+    data.sets.refs[work.id] = new Set(work.referenced_works);
     
-    work.primary_location?.source &&
+    if (work.primary_location?.source) {
       incOrCreate(data.sources, work.primary_location.source.id, 'count');
+      data.sets.sources[work.id].add(work.primary_location.source.id);
+    }
 
     // Use Sets to count each country and institution mentionned ONLY ONCE per work
-    let countries = new Set();
-    let institutions = new Set();
     work.authorships.forEach((authorship) => {
       incOrCreate(data.authors, authorship.author.id, 'count');
+      data.sets.authors[work.id].add(authorship.author.id);
+
       authorship.countries.forEach((country) => {
-	countries.add(country);
+	data.sets.countries[work.id].add(country);
       });
       authorship.institutions.forEach((institution) => {
-	institutions.add(institution.id);
+	data.sets.institutions[work.id].add(institution.id);
       });
     });
-    countries.forEach((country) => {
+    data.sets.countries[work.id].forEach((country) => {
       incOrCreate(data.countries, country, 'count');
     });
-    institutions.forEach((institution) => { // This is only the id!
+    data.sets.institutions[work.id].forEach((institution) => { // This is only the id!
       incOrCreate(data.institutions, institution, 'count');
     });
 
     work.concepts.forEach((concept) => {
       incOrCreate(data.concepts, concept.id, 'count');
+      data.sets.concepts[work.id].add(concept.id);
     });
 
     work.grants.forEach((grant) => {
       incOrCreate(data.funders, grant.funder, 'count');
+      data.sets.funders[work.id].add(grant.funder);
     });
   });
 
@@ -82,15 +89,36 @@ export const getFilters = (data) => {
   return filters;
 };
 
-export const filterData = (data, filters) => {
-  let filteredData = {};
-  Object.keys(data).forEach((key) => {
-    if (fields.includes(key)) {
-      let threshold = filters[key].lowerBounds[filters[key].value];
-      filteredData[key] = Object.fromEntries(Object.entries(data[key]).filter(([, {count}]) => count >= threshold));
-    } else {
-      filteredData[key] = data[key];
+function intersection(setA, setB) {
+  const _intersection = new Set();
+  for (const elem of setB) {
+    if (setA.has(elem)) {
+      _intersection.add(elem);
     }
+  }
+  return _intersection;
+}
+
+export const filterData = (data, filters) => {
+  const filteredData = {};
+  filteredData.sets = {};
+
+  console.time('filter');
+
+  // Filter the refs first to get refsSet and use it to filter later
+  const threshold = filters.refs.lowerBounds[filters.refs.value];
+  filteredData.refs = Object.fromEntries(Object.entries(data.refs).filter(([, {count}]) => count >= threshold));
+  const refsSet = new Set(Object.keys(filteredData.refs));
+  filteredData.sets.refs = Object.fromEntries(Object.entries(data.sets.refs).map(([id, fieldSet]) => [id, intersection(refsSet, fieldSet)]).filter(([, fieldSet]) => fieldSet.size > 0));
+
+  metadataFields.forEach((field) => {
+    const threshold = filters[field].lowerBounds[filters[field].value];
+    filteredData[field] = Object.fromEntries(Object.entries(data[field]).filter(([, {count}]) => count >= threshold));
+    const wholeSet = new Set(Object.keys(filteredData[field]));
+    filteredData.sets[field] = Object.fromEntries(Object.entries(data.sets[field]).map(([id, fieldSet]) => [id, intersection(wholeSet, fieldSet)]).filter(([id, fieldSet]) => fieldSet.size > 0 && refsSet.has(id)));
   });
+
+  console.timeEnd('filter');
+
   return filteredData;
 };

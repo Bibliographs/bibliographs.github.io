@@ -15,19 +15,12 @@ export const fieldColors = {
 };
 
 export const fields = Object.keys(fieldColors);
-
-function intersection(setA, setB) {
-  const _intersection = new Set();
-  for (const elem of setB) {
-    if (setA.has(elem)) {
-      _intersection.add(elem);
-    }
-  }
-  return _intersection;
-}
+export const metadataFields = fields.filter(field => field !== 'refs');
 
 export const generateGraph = (data) => {
   let graph = new UndirectedGraph({ allowSelfLoops: false });
+
+  // Step 1: Create the map background (refs)
 
   console.time('add refs nodes');
   Object.entries(data['refs']).forEach(([id, {count}]) => {
@@ -43,26 +36,24 @@ export const generateGraph = (data) => {
 
   // Add edges between refs that are co-cited
   console.time('add ref edges');
-  let refsSet = new Set(Object.keys(data.refs));
-
-  // In order to speed up, we need an intermediate representation.
-  // [ref_id, [Set(co-cited_refs)...]]
-  // Basically, for each ref there is an array of sets containing the co-cited refs in a particular work.
-  // Each set corresponds to a all the references for a work, we then only keep the refs that passed the filter
-  // in each of those sets.
-  let cocited = Object.keys(data.refs).map((ref) => {
-    return [ref, data.cocitedRefs.filter((cocitedRefs) => cocitedRefs.has(ref)).map((cocitedRefs) => intersection(refsSet, cocitedRefs))];
-  });
-
+  const refs = new Set(Object.keys(data.refs));
+  const refsSets = Object.values(data.sets.refs);
   const doneEdges = new Set(); // Useful to avoid updating edges in both ways (since it's undirected graph)
-  for (const [ref, refSets] of cocited) {
-    for (const refSet of refSets) {
-      for (const ref2 of refSet) {
-	if (ref !== ref2 && !doneEdges.has(ref2)) {
-	  graph.updateEdge(ref, ref2, attr => ({
-	    ...attr,
-	    weight: (attr.weight || 0) + 1,
-	  }));
+
+  // What happens here is that for every single refs (filtered at this point), we go through all the
+  // sets of refs (the set of co-cited refs for a work) and if the current ref is in it we increment
+  // or create the edge weight between this ref and all the co-cited except for the ones in doneEdges.
+  // This avoids double counting.
+  for (const ref of refs) {
+    for (const refsSet of refsSets) {
+      if (refsSet.has(ref)) {
+	for (const ref2 of refsSet) {
+	  if (ref !== ref2 && !doneEdges.has(ref2)) {
+	    graph.updateEdge(ref, ref2, attr => ({
+	      ...attr,
+	      weight: (attr.weight || 0) + 1,
+	    }));
+	  }
 	}
       }
     }
