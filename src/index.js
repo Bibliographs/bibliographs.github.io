@@ -1,11 +1,19 @@
-import "@ajusa/lit/src/lit.css";
+import '@ajusa/lit/src/lit.css';
 import './index.css';
 
 import Alpine from 'alpinejs';
 
-import './lib/fetch.js';
-import './lib/processing.js';
+import { fetchWorks } from './lib/fetch.js';
+import { processWorks, getFilters, filterData, generateJSONDataURL } from './lib/processing.js';
+import { generateGraph, generateGexfURL } from './lib/graph.js';
 
+window.fetchWorks = fetchWorks;
+window.processWorks = processWorks;
+window.getFilters = getFilters;
+window.filterData = filterData;
+window.generateGraph = generateGraph;
+window.generateGexfURL = generateGexfURL;
+window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
   query: '',
@@ -20,6 +28,7 @@ Alpine.data('App', () => ({
   data: {},
   filters: {},
   filteredData: {},
+  graph: null,
 
   loading(nextState, msg = '') {
     this.state = 'loading';

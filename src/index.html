@@ -20,6 +20,7 @@
     <div x-effect="console.log('data', data); console.log('numrefs:', data.refs ? Object.keys(data.refs).length : 0)"></div>
     <div x-effect="console.log('filters', filters)"></div>
     <div x-effect="console.log('filteredData', filteredData)"></div>
+    <div x-effect="console.log('graph', graph)"></div>
 
     
     <!-- LOADING -->
@@ -131,11 +132,12 @@
 	<div>
 	  <button class="btn primary"
 		  @click="
-			 loading('filters');
-			 data = processWorks(works);
-			 filters = getFilters(data);
-			 done();
-			 ">
+			 loading('filters', 'Processing corpus data');
+			 setTimeout(() => {
+			   data = processWorks(works);
+			   filters = getFilters(data);
+			   done();
+			 }, 10);">
 	  Validate corpus
 	  </button>
 	  <span x-show="count > maxWorks" style="color: red">Incomplete corpus!</span>
@@ -200,10 +202,13 @@
 	  </template>
 	</div>
 	<button class="btn primary"
-		@click="
-		       loading('visualization');
-		       filteredData = filterData(data, filters);
-		       done();">
+		       @click="
+		       loading('visualization', 'Generating Graph...');
+		       setTimeout(() => {
+		         filteredData = filterData(data, filters);
+		         graph = generateGraph(filteredData);
+		         done();
+		       }, 10);">
 	  Visualize Results
 	</button>
       </main>
@@ -213,7 +218,16 @@
     <!-- VISUALIZATION -->
     <template x-if="state == 'visualization'">
       <main class="c">
-	<h2 class="center">Not Implemented Yet</h2>
+	<a class="btn"
+	   :href="generateGexfURL(graph)"
+	   download="graph.gexf">
+	  Download .gexf file
+	</a>
+	<a class="btn"
+	   :href="generateJSONDataURL(filteredData)"
+	   download="bibliograph-data.json">
+	  Download JSON data
+	</a>
       </main>
     </template>
   </body>
