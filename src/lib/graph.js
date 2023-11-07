@@ -63,18 +63,90 @@ export const generateGraph = (data) => {
   }
   console.timeEnd('add ref edges');
 
+  // Discard disconnected components
   graph = largestConnectedComponentSubgraph(graph);
 
-  console.time('force atlas');
+  // Spatialize the refs nodes
+  console.time('ref force atlas');
   circular.assign(graph);
   forceAtlas2.assign(graph, {
     iterations: 500,
     settings: forceAtlas2.inferSettings(graph),
   });
-  console.timeEnd('force atlas');
+  console.timeEnd('ref force atlas');
 
   // Fix the refs nodes in place (final position for refs)
   graph.forEachNode((nodeRef) => graph.mergeNodeAttributes(nodeRef, {fixed: true}));
+
+  // Step 2: Add metadata to the graph
+
+  console.time('add metadata');
+  let i = 0;
+  let totalMetadataNodes = 0;
+  for (const field of metadataFields) {
+    totalMetadataNodes += Object.keys(data[field]).length;
+  }
+
+  for (const field of metadataFields) {
+    for (const [id, {count}] of Object.entries(data[field])) {
+      graph.addNode(id, {
+	label: id,
+	size: Math.sqrt(count),
+	color: fieldColors[field],
+	count,
+	dataType: field,
+      });
+
+      // Get the list of works containing that metadata
+      const works = Object.entries(data.sets[field]).filter(([workId, fieldSet]) => fieldSet.has(id)).map(([workId,]) => workId);
+
+      // Add edges between this metadata and all the refs that are co-cited
+      for (const work of works) {
+	if (typeof data.sets.refs[work] !== 'undefined') {
+	  for (const ref of data.sets.refs[work]) {
+	    graph.updateEdge(id, ref, attr => ({
+	      ...attr,
+	      weight: (attr.weight || 0) + 1,
+	    }));
+	  }
+	}
+      }
+
+      // Put the metadata node at the barycenter of its neighbors
+      const neighborsCount = graph.neighbors(id).length;
+      if (neighborsCount > 0) {
+	let x = 0;
+	let y = 0;
+
+	graph.forEachNeighbor(id, (node, attr) => {
+	  x += attr.x;
+	  y += attr.y;
+	});
+
+	// Add some very tiny and unique vector, to prevent nodes to have exactly the same coordinates.
+	// The tiny vector must not be random, so that the layout remains reproducible.
+	x = x / neighborsCount +
+          Math.cos((Math.PI * 2 * i) / totalMetadataNodes) / 100;
+	y = y / neighborsCount +
+          Math.sin((Math.PI * 2 * i) / totalMetadataNodes) / 100;
+	i += 1;
+
+	graph.mergeNodeAttributes(id, {x, y});
+      }
+    }
+  }
+  console.timeEnd('add metadata');
+
+  // Discard disconnected components
+  graph = largestConnectedComponentSubgraph(graph);
+
+  // Spatialize the metadata nodes
+  console.time('metadata force atlas');
+  forceAtlas2.assign(graph, {
+    iterations: 100,
+    settings: forceAtlas2.inferSettings(graph),
+  });
+  console.timeEnd('metadata force atlas');
 
   graph.setAttribute('datasource', 'OpenAlex');
   graph.setAttribute('workscount', Object.keys(data.sets.refs).lenght);
