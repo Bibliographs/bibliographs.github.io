@@ -149,7 +149,7 @@ export const generateGraph = (data) => {
   console.timeEnd('metadata force atlas');
 
   graph.setAttribute('datasource', 'OpenAlex');
-  graph.setAttribute('workscount', Object.keys(data.sets.refs).lenght);
+  graph.setAttribute('workscount', Object.keys(data.sets.refs).length);
 
   return graph;
 };
