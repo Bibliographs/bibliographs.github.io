@@ -4,7 +4,7 @@ import './index.css';
 import Alpine from 'alpinejs';
 
 import { fetchWorks } from './lib/fetch.js';
-import { processWorks, getFilters, filterData } from './lib/processing.js';
+import { processWorks, getFilters, filterData, generateJSONDataURL } from './lib/processing.js';
 import { generateGraph, generateGexfURL } from './lib/graph.js';
 
 window.fetchWorks = fetchWorks;
@@ -13,6 +13,7 @@ window.getFilters = getFilters;
 window.filterData = filterData;
 window.generateGraph = generateGraph;
 window.generateGexfURL = generateGexfURL;
+window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
   query: '',

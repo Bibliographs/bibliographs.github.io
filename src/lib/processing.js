@@ -122,3 +122,10 @@ export const filterData = (data, filters) => {
 
   return filteredData;
 };
+
+export const generateJSONDataURL = (data) => {
+  const blob = new Blob([JSON.stringify(data, (_key, value) => (value instanceof Set ? [...value] : value), 2)], {
+    type: 'application/json',
+  });
+  return URL.createObjectURL(blob);
+}
