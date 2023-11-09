@@ -35,7 +35,7 @@ export const fetchWorks = async (query, fromYear, toYear, maxWorks) => {
       return data.results;
     }));
 
-    works = works.flat().slice(0, maxWorks);
+    works = works.flat().slice(0, maxWorks).filter(work => work);
   }
   
   return {count, works};
