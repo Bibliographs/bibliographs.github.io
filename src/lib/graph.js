@@ -88,9 +88,9 @@ export const generateGraph = (data) => {
   }
 
   for (const field of metadataFields) {
-    for (const [id, {count}] of Object.entries(data[field])) {
+    for (const [id, {count, label}] of Object.entries(data[field])) {
       graph.addNode(id, {
-	label: id,
+	label,
 	size: Math.sqrt(count),
 	color: fieldColors[field],
 	count,
