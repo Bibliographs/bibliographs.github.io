@@ -23,9 +23,9 @@ export const generateGraph = (data) => {
   // Step 1: Create the map background (refs)
 
   console.time('add refs nodes');
-  Object.entries(data['refs']).forEach(([id, {count}]) => {
+  Object.entries(data['refs']).forEach(([id, {count, label}]) => {
     graph.addNode(id, {
-      label: id,
+      label,
       size: Math.sqrt(count),
       color: fieldColors['refs'],
       count,
