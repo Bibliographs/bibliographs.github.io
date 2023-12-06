@@ -24,15 +24,19 @@ export const processWorks = (works) => {
       incOrCreate(data.refs, ref, 'count');
     });
     data.sets.refs[work.id] = new Set(work.referenced_works);
-    
+
+    // TODO think about using all the associated sources
     if (work.primary_location?.source) {
       incOrCreate(data.sources, work.primary_location.source.id, 'count');
+      data.sources[work.primary_location.source.id].label = work.primary_location.source.display_name;
       data.sets.sources[work.id].add(work.primary_location.source.id);
     }
 
+    const institutions = {}; // Save institions objects to retrieve the labels later
     // Use Sets to count each country and institution mentionned ONLY ONCE per work
     work.authorships.forEach((authorship) => {
       incOrCreate(data.authors, authorship.author.id, 'count');
+      data.authors[authorship.author.id].label = authorship.author.display_name;
       data.sets.authors[work.id].add(authorship.author.id);
 
       authorship.countries.forEach((country) => {
@@ -40,22 +44,27 @@ export const processWorks = (works) => {
       });
       authorship.institutions.forEach((institution) => {
 	data.sets.institutions[work.id].add(institution.id);
+	institutions[institution.id] = institution;
       });
     });
     data.sets.countries[work.id].forEach((country) => {
       incOrCreate(data.countries, country, 'count');
+      data.countries[country].label = country;
     });
-    data.sets.institutions[work.id].forEach((institution) => { // This is only the id!
-      incOrCreate(data.institutions, institution, 'count');
+    data.sets.institutions[work.id].forEach((institutionId) => { // This is only the id!
+      incOrCreate(data.institutions, institutionId, 'count');
+      data.institutions[institutionId].label = institutions[institutionId].display_name;
     });
 
     work.concepts.forEach((concept) => {
       incOrCreate(data.concepts, concept.id, 'count');
+      data.concepts[concept.id].label = concept.display_name;
       data.sets.concepts[work.id].add(concept.id);
     });
 
     work.grants.forEach((grant) => {
       incOrCreate(data.funders, grant.funder, 'count');
+      data.funders[grant.funder].label = grant.funder_display_name;
       data.sets.funders[work.id].add(grant.funder);
     });
   });
