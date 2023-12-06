@@ -1,4 +1,5 @@
 import { fields, metadataFields } from './graph.js';
+import { fetchRefsLabels } from './fetch.js';
 
 const incOrCreate = (obj, key, subkey=false) => {
   if (subkey) {
@@ -22,6 +23,7 @@ export const processWorks = (works) => {
 
     work.referenced_works.forEach((ref) => {
       incOrCreate(data.refs, ref, 'count');
+      data.refs[ref].label = ref;
     });
     data.sets.refs[work.id] = new Set(work.referenced_works);
 
@@ -108,7 +110,7 @@ function intersection(setA, setB) {
   return _intersection;
 }
 
-export const filterData = (data, filters) => {
+export const filterData = async (data, filters) => {
   const filteredData = {};
   filteredData.sets = {};
 
@@ -116,9 +118,20 @@ export const filterData = (data, filters) => {
 
   // Filter the refs first to get refsSet and use it to filter later
   const threshold = filters.refs.lowerBounds[filters.refs.value];
-  filteredData.refs = Object.fromEntries(Object.entries(data.refs).filter(([, {count}]) => count >= threshold));
+  const filteredRefs = Object.entries(data.refs)
+	.filter(([, {count}]) => count >= threshold)
+	.sort(([, {count1}], [, {count2}]) => count2 - count1); // Sort in reverse order, we want the top ones first
+  filteredData.refs = Object.fromEntries(filteredRefs);
   const refsSet = new Set(Object.keys(filteredData.refs));
   filteredData.sets.refs = Object.fromEntries(Object.entries(data.sets.refs).map(([id, fieldSet]) => [id, intersection(refsSet, fieldSet)]).filter(([, fieldSet]) => fieldSet.size > 0));
+
+  // Get the refs labels
+  console.time('label refs');
+  const refsLabels = await fetchRefsLabels(filteredRefs.map(([id,]) => id));
+  for (const {id, display_name} of refsLabels) {
+    filteredData.refs[id].label = display_name;
+  }
+  console.timeEnd('label refs');
 
   metadataFields.forEach((field) => {
     const threshold = filters[field].lowerBounds[filters[field].value];
