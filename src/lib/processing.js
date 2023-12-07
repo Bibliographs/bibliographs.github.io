@@ -113,6 +113,7 @@ function intersection(setA, setB) {
 export const filterData = async (data, filters) => {
   const filteredData = {};
   filteredData.sets = {};
+  filteredData.maxCounts = {};
 
   console.time('filter');
 
@@ -124,6 +125,8 @@ export const filterData = async (data, filters) => {
   filteredData.refs = Object.fromEntries(filteredRefs);
   const refsSet = new Set(Object.keys(filteredData.refs));
   filteredData.sets.refs = Object.fromEntries(Object.entries(data.sets.refs).map(([id, fieldSet]) => [id, intersection(refsSet, fieldSet)]).filter(([, fieldSet]) => fieldSet.size > 0));
+
+  filteredData.maxCounts.refs = filteredRefs.reduce((acc, [, {count}]) => Math.max(acc, count), 0);
 
   // Get the refs labels
   console.time('label refs');
@@ -138,6 +141,8 @@ export const filterData = async (data, filters) => {
     filteredData[field] = Object.fromEntries(Object.entries(data[field]).filter(([, {count}]) => count >= threshold));
     const wholeSet = new Set(Object.keys(filteredData[field]));
     filteredData.sets[field] = Object.fromEntries(Object.entries(data.sets[field]).map(([id, fieldSet]) => [id, intersection(wholeSet, fieldSet)]).filter(([id, fieldSet]) => fieldSet.size > 0 && filteredData.sets.refs[id]));
+
+    filteredData.maxCounts[field] = Object.values(filteredData[field]).reduce((acc, {count}) => Math.max(acc, count), 0);
   });
 
   console.timeEnd('filter');
