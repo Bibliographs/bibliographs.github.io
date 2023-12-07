@@ -120,7 +120,7 @@ export const filterData = async (data, filters) => {
   const threshold = filters.refs.lowerBounds[filters.refs.value];
   const filteredRefs = Object.entries(data.refs)
 	.filter(([, {count}]) => count >= threshold)
-	.sort(([, {count1}], [, {count2}]) => count2 - count1); // Sort in reverse order, we want the top ones first
+	.sort(([, {count: count1}], [, {count: count2}]) => count2 - count1); // Sort in reverse order, we want the top ones first
   filteredData.refs = Object.fromEntries(filteredRefs);
   const refsSet = new Set(Object.keys(filteredData.refs));
   filteredData.sets.refs = Object.fromEntries(Object.entries(data.sets.refs).map(([id, fieldSet]) => [id, intersection(refsSet, fieldSet)]).filter(([, fieldSet]) => fieldSet.size > 0));
