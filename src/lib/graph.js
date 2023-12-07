@@ -17,16 +17,19 @@ export const fieldColors = {
 export const fields = Object.keys(fieldColors);
 export const metadataFields = fields.filter(field => field !== 'refs');
 
+const maxRefNodeSize = 900;
+const maxMetadataNodeSize = 2500;
+
 export const generateGraph = (data) => {
   let graph = new UndirectedGraph({ allowSelfLoops: false });
 
   // Step 1: Create the map background (refs)
 
   console.time('add refs nodes');
-  Object.entries(data['refs']).forEach(([id, {count}]) => {
+  Object.entries(data['refs']).forEach(([id, {count, label}]) => {
     graph.addNode(id, {
-      label: id,
-      size: Math.sqrt(count),
+      label,
+      size: Math.sqrt(maxRefNodeSize * count / data.maxCounts.refs),
       color: fieldColors['refs'],
       count,
       dataType: 'refs',
@@ -88,10 +91,10 @@ export const generateGraph = (data) => {
   }
 
   for (const field of metadataFields) {
-    for (const [id, {count}] of Object.entries(data[field])) {
+    for (const [id, {count, label}] of Object.entries(data[field])) {
       graph.addNode(id, {
-	label: id,
-	size: Math.sqrt(count),
+	label,
+	size: Math.sqrt(maxMetadataNodeSize * count / data.maxCounts[field]),
 	color: fieldColors[field],
 	count,
 	dataType: field,

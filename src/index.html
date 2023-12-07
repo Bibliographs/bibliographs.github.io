@@ -202,10 +202,10 @@
 	  </template>
 	</div>
 	<button class="btn primary"
-		       @click="
+		@click="
 		       loading('visualization', 'Generating Graph...');
+		       filteredData = await filterData(data, filters);
 		       setTimeout(() => {
-		         filteredData = filterData(data, filters);
 		         graph = generateGraph(filteredData);
 		         done();
 		       }, 10);">
