@@ -137,7 +137,7 @@ export const filterData = async (data, filters) => {
     const threshold = filters[field].lowerBounds[filters[field].value];
     filteredData[field] = Object.fromEntries(Object.entries(data[field]).filter(([, {count}]) => count >= threshold));
     const wholeSet = new Set(Object.keys(filteredData[field]));
-    filteredData.sets[field] = Object.fromEntries(Object.entries(data.sets[field]).map(([id, fieldSet]) => [id, intersection(wholeSet, fieldSet)]).filter(([id, fieldSet]) => fieldSet.size > 0 && refsSet.has(id)));
+    filteredData.sets[field] = Object.fromEntries(Object.entries(data.sets[field]).map(([id, fieldSet]) => [id, intersection(wholeSet, fieldSet)]).filter(([id, fieldSet]) => fieldSet.size > 0 && filteredData.sets.refs[id]));
   });
 
   console.timeEnd('filter');
