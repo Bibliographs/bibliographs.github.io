@@ -1,6 +1,6 @@
 window.perPage = 200;
 
-export const fetchWorks = async (query, fromYear, toYear, maxWorks) => {
+export const fetchWorks = async (query, queryconcept, fromYear, toYear, maxWorks) => {
   let works = [];
   let count = 0;
   
@@ -11,6 +11,10 @@ export const fetchWorks = async (query, fromYear, toYear, maxWorks) => {
     filters.push(`from_publication_date:${fromYear}-01-01`);
     filters.push(`to_publication_date:${toYear}-12-31`);
     filters.push(`default.search:${query}`);
+
+    if (queryconcept && queryconcept !== '') {
+      filters.push(`concepts.id:${queryconcept}`);
+    }
 
     works = await Promise.all([...Array(numReq).keys()].map(async (i) => {
       let data = {};

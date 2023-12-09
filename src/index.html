@@ -60,7 +60,7 @@
 	<br />
 	<form @submit.prevent="
 			       loading('corpus', 'Fetching corpus from OpenAlex API');
-			       ({count, works} = await fetchWorks(query, fromYear, toYear, maxWorks));
+			       ({count, works} = await fetchWorks(query, queryconcept, fromYear, toYear, maxWorks));
 			       done();" >
 	  <div>
 	    <label for="query" >
@@ -71,6 +71,16 @@
 		   placeholder="Type words to be searched in works"
 		   type="search"
 		   x-model="query" />
+	  </div>
+	  <div>
+	    <label for="queryconcept" >
+	      Search for works with the concept IDs. (to enter multiple concepts, separate with '|')
+	    </label>
+	    <input id="queryconcept"
+		   class="card w-100"
+		   placeholder="E.g. C11012388|C41008148|..."
+		   type="search"
+		   x-model="queryconcept" />
 	  </div>
 	  <div>
             <span>Only select works published between</span>
@@ -87,13 +97,13 @@
 	      x-model="toYear" />
 	  </div>
 	  <div>
-	    <span>Fetch a corpus of up to</span>
+	    <span>Fetch a corpus of up to (max 10'000)</span>
 	    <input
 	      id="max-fetch"
 	      class="card"
               type="number"
 	      min="1"
-	      max="100000"
+	      max="10000"
 	      x-model="maxWorks" />
 	    <span>most cited works</span>
 	  </div>

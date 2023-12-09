@@ -17,6 +17,7 @@ window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
   query: '',
+  queryconcept: '',
   fromYear: 1900,
   toYear: 2100,
   maxWorks: 10000,
