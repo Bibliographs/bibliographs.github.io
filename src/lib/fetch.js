@@ -4,15 +4,18 @@ export const fetchWorks = async (query, queryconcept, fromYear, toYear, maxWorks
   let works = [];
   let count = 0;
   
-  if (query !== "") {
+  if (query !== '' || queryconcept !== '') {
     const filters = [];
     const numReq = Math.ceil(maxWorks / perPage);
 
     filters.push(`from_publication_date:${fromYear}-01-01`);
     filters.push(`to_publication_date:${toYear}-12-31`);
-    filters.push(`default.search:${query}`);
 
-    if (queryconcept && queryconcept !== '') {
+    if (query !== '') {
+      filters.push(`default.search:${query}`);
+    }
+
+    if (queryconcept !== '') {
       filters.push(`concepts.id:${queryconcept}`);
     }
 
