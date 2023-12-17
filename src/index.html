@@ -197,8 +197,12 @@
 	      <h4 x-text="field"></h4>
               <div>
 		Keep the <strong x-text="filter.counts[filter.value]"></strong> 
-		<span x-text="field"></span> occurring in at
-		least <strong x-text="filter.lowerBounds[filter.value]"></strong> records
+		<span x-text="field"></span>
+		<span x-show="field !== 'works'">occurring in at least</span>
+		<span x-show="field === 'works'">with at least</span>
+		<strong x-text="filter.lowerBounds[filter.value]"></strong>
+		<span x-show="field !== 'works'">records</span>
+		<span x-show="field === 'works'">citations</span>
 	      </div>
               <div>
 		<span style="float: left">0</span>

@@ -6,6 +6,7 @@ import forceAtlas2 from 'graphology-layout-forceatlas2';
 
 export const fieldColors = {
   refs: '#ebebeb',
+  works: '#202020',
   authors: '#ffe915',
   sources: '#a7d30d',
   concepts: '#9dabf5',

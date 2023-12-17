@@ -21,6 +21,9 @@ export const processWorks = (works) => {
       data.sets[field][work.id] = new Set();
     }
 
+    data.works[`work-${work.id}`] = {count: work.cited_by_count, label: work.title};
+    data.sets.works[work.id].add(`work-${work.id}`);
+
     work.referenced_works.forEach((ref) => {
       incOrCreate(data.refs, ref, 'count');
       data.refs[ref].label = ref;
