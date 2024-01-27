@@ -16,11 +16,8 @@ window.generateGexfURL = generateGexfURL;
 window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
-  query: '',
-  queryconcept: '',
-  fromYear: 1900,
-  toYear: 2100,
-  maxWorks: 10000,
+  params: [{type: 'title', value: ''}],
+  maxWorks: 1000,
   state: 'search',
   nextState: '',
   loadingMsg: '',

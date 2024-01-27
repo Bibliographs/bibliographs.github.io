@@ -57,46 +57,7 @@
 	  investigate, refine your corpus, select the filtering
 	  thresholds and explore your bibliographic landscape.
 	</p>
-	<br />
-	<form @submit.prevent="
-			       loading('corpus', 'Fetching corpus from OpenAlex API');
-			       ({count, works} = await fetchWorks(query, queryconcept, fromYear, toYear, maxWorks));
-			       done();" >
-	  <div>
-	    <label for="query" >
-	      Search for words in works' title, abstract and full-text
-	    </label>
-	    <input id="query"
-		   class="card w-100"
-		   placeholder="Type words to be searched in works"
-		   type="search"
-		   x-model="query" />
-	  </div>
-	  <div>
-	    <label for="queryconcept" >
-	      Search for works with the concept IDs. (to enter multiple concepts, separate with '|')
-	    </label>
-	    <input id="queryconcept"
-		   class="card w-100"
-		   placeholder="E.g. C11012388|C41008148|..."
-		   type="search"
-		   x-model="queryconcept" />
-	  </div>
-	  <div>
-            <span>Only select works published between</span>
-            <input
-	      id="from-year"
-	      class="card"
-              type="number"
-	      x-model="fromYear" />
-            <span>and</span>
-	    <input
-	      id="to-year"
-	      class="card"
-              type="number"
-	      x-model="toYear" />
-	  </div>
-	  <div>
+	<div>
 	    <span>Fetch a corpus of up to (max 10'000)</span>
 	    <input
 	      id="max-fetch"
@@ -106,7 +67,96 @@
 	      max="10000"
 	      x-model="maxWorks" />
 	    <span>most cited works</span>
+	</div>
+	<br />
+	<form @submit.prevent="
+			       loading('corpus', 'Fetching corpus from OpenAlex API');
+			       ({count, works} = await fetchWorks(params, maxWorks));
+			       done();" >
+	  <div class="card">
+	    <template x-for="(param, index) in params">
+	      <div>
+		<label :for="`type-${index}`" >
+		  Type:
+		</label>
+		<select :id="`type-${index}`" x-model="param.type">
+		  <option value="date" >Filter by date range</option>
+		  <option value="title" >Search in title</option>
+		  <option value="titleabs" >Search in title and abstract</option>
+		  <option value="titleabsfull" >Search in title, abstract and full text</option>
+		  <option value="concept" >Filter by concept</option>
+		</select>
+		<button type="button" @click.prevent="params.splice(index, 1)">X</button>
+
+		<template x-if="param.type === 'date'">
+		  <div>
+		    <span>From</span>
+		    <input
+		      :id="`from-${index}`"
+		      class="card"
+		      placeholder="Enter a year. E.g. 2008"
+		      type="number"
+		      x-model="param.fromYear" />
+		    <span>to</span>
+		    <input
+		      :id="`to-${index}`"
+		      class="card"
+		      placeholder="Enter a year. E.g. 2008"
+		      type="number"
+		      x-model="param.toYear" />
+		  </div>
+		</template>
+		<template x-if="param.type === 'title'">
+		  <div>
+		    <input :id="`value-${index}`"
+			   class="card w-100"
+			   placeholder="Search for words in works' title"
+			   type="search"
+			   x-model="param.value" />
+		    <a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
+		  </div>
+		</template>
+		<template x-if="param.type === 'titleabs'">
+		  <div>
+		    <input :id="`value-${index}`"
+			   class="card w-100"
+			   placeholder="Search for words in works' title and abstract"
+			   type="search"
+			   x-model="param.value" />
+		    <a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
+		  </div>
+		</template>
+		<template x-if="param.type === 'titleabsfull'">
+		  <div>
+		    <input :id="`value-${index}`"
+			   class="card w-100"
+			   placeholder="Search for words in works' title, abstract and full-text"
+			   type="search"
+			   x-model="param.value" />
+		    <a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
+		  </div>
+		</template>
+		<template x-if="param.type === 'concept'">
+		  <div>
+		    <label :for="`value-${index}`" >
+		      Search for works with the concept IDs. (to enter multiple concepts, separate with '|')
+		    </label>
+		    <input :id="`value-${index}`"
+			   class="card w-100"
+			   placeholder="E.g. C11012388|C41008148|..."
+			   type="search"
+			   x-model="param.value" />
+		  </div>
+		</template>
+	      </div>
+	    </template>
+
+	    <button type="button" class="btn center-btn"
+		    @click.prevent="params.push({type: 'date', fromYear: 1900, toYear: 2100})">
+	      Add query param
+	    </button>
 	  </div>
+
 	  <button class="btn primary" >
 	    Fetch Corpus
 	  </button>
