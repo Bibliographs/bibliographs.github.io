@@ -20,7 +20,7 @@ window.generateGexfURL = generateGexfURL;
 window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
-  params: [{type: 'title', value: ''}],
+  params: [{type: 'titleabs', value: ''}],
   maxWorks: 1000,
   state: 'search',
   nextState: '',
