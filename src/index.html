@@ -137,15 +137,35 @@
 		  </div>
 		</template>
 		<template x-if="param.type === 'concept'">
-		  <div>
-		    <label :for="`value-${index}`" >
-		      Search for works with the concept IDs. (to enter multiple concepts, separate with '|')
-		    </label>
-		    <input :id="`value-${index}`"
+		  <div x-data="{ ac: null, str: '' }"
+		       x-init="param.concepts = [];
+			       param.op = 'or';
+			       $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteConceptConfig}))">
+		    <input :id="`search-${index}`"
 			   class="card w-100"
-			   placeholder="E.g. C11012388|C41008148|..."
 			   type="search"
-			   x-model="param.value" />
+			   x-model="str"
+			   @selection="param.concepts.push($event.detail.selection.value); str='';" />
+		    <input :id="`radio-or-${index}`"
+			   :name="`radio-${index}`"
+			   class="concept-radio-or"
+			   type="radio"
+			   value="or"
+			   x-model="param.op" />
+		    <label :for="`radio-or-${index}`" >OR</label>
+		    <input :id="`radio-and-${index}`"
+			   :name="`radio-${index}`"
+			   class="concept-radio-and"
+			   type="radio"
+			   value="and"
+			   x-model="param.op" />
+		    <label :for="`radio-and-${index}`" >AND</label>
+
+		    <ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'">
+		      <template x-for="(concept, i) in param.concepts">
+			<li x-text="concept.display_name"></li>
+		      </template>
+		    </ul>
 		  </div>
 		</template>
 	      </div>

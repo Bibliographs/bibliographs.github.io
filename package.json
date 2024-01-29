@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@ajusa/lit": "^1.1.0",
+    "@tarekraafat/autocomplete.js": "10.2.7",
     "alpinejs": "^3.13.0",
     "graphology": "0.25.4",
     "graphology-components": "^1.5.4",

@@ -7,6 +7,11 @@ const toQueryParams = (params) => {
     if (param.type === 'date') {
       queryParams.fromYear = param.fromYear;
       queryParams.toYear = param.toYear;
+    } else if (param.type === 'concept') {
+      console.log(param.concepts);
+      const op = param.op === 'or' ? '|' : ' ';
+      const conceptsIds = param.concepts.map((concept) => concept.id.substring(concept.id.lastIndexOf('/') + 1));
+      queryParams.concepts = conceptsIds.join(op);
     } else {
       queryParams[param.type] = param.value;
     }
@@ -21,7 +26,7 @@ export const fetchWorks = async (params, maxWorks) => {
   let count = 0;
   
   if (qp.title || qp.titleabs ||
-      qp.titleabsfull || qp.concept) {
+      qp.titleabsfull || qp.concepts) {
     const filters = [];
     const numReq = Math.ceil(maxWorks / perPage);
 
@@ -42,8 +47,8 @@ export const fetchWorks = async (params, maxWorks) => {
       filters.push(`default.search:${qp.titleabsfull}`);
     }
 
-    if (qp.concept) {
-      filters.push(`concepts.id:${qp.concept}`);
+    if (qp.concepts) {
+      filters.push(`concepts.id:${qp.concepts}`);
     }
 
     works = await Promise.all([...Array(numReq).keys()].map(async (i) => {
@@ -57,7 +62,7 @@ export const fetchWorks = async (params, maxWorks) => {
             mailto: `****@****.com`,
             "per-page": perPage,
 	    page: i+1,
-	  }));
+	  }).toString());
 	if (!response.ok) {
 	  throw new Error("Network response was not OK");
 	}

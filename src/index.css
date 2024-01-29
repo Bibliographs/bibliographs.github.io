@@ -7,6 +7,27 @@
     margin: auto;
 }
 
+.concept-radio-or {
+    margin-left: 20px;
+}
+
+.concept-radio-and {
+    margin-left: 10px;
+}
+
+.concept-list-or li, .concept-list-and li {
+    display: inline;
+    list-style: none;
+}
+
+.concept-list-or li + li::before {
+    content: " OR ";
+}
+
+.concept-list-and li + li::before {
+    content: " AND ";
+}
+
 .corpus-too-big {
     border: red 2px solid;
     border-radius: 5px;
