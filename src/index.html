@@ -161,9 +161,15 @@
 			   x-model="param.op" />
 		    <label :for="`radio-and-${index}`" >AND</label>
 
-		    <ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'">
+		    <ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'" class="concept-list">
 		      <template x-for="(concept, i) in param.concepts">
-			<li x-text="concept.display_name"></li>
+			<li>
+			  <span class="card">
+			    <span x-text="concept.display_name"></span>
+			    |
+			    <a href="#" @click.prevent='param.concepts.splice(i, 1)'>x</a>
+			  </span>
+			</li>
 		      </template>
 		    </ul>
 		  </div>

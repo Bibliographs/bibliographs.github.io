@@ -15,7 +15,12 @@
     margin-left: 10px;
 }
 
-.concept-list-or li, .concept-list-and li {
+.concept-list {
+    margin-top: 1.5em;
+    padding: 0;
+}
+
+.concept-list li {
     display: inline;
     list-style: none;
 }
@@ -26,6 +31,11 @@
 
 .concept-list-and li + li::before {
     content: " AND ";
+}
+
+.concept-list .card {
+    padding: 0.5em;
+    margin-right: 0.3em;
 }
 
 .corpus-too-big {
