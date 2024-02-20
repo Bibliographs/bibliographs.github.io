@@ -138,8 +138,8 @@
 		</template>
 		<template x-if="param.type === 'concept'">
 		  <div x-data="{ ac: null, str: '' }"
-		       x-init="param.concepts = [];
-			       param.op = 'or';
+		       x-init="param.concepts = param.concepts || [];
+			       param.op = param.op || 'or';
 			       $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteConceptConfig}))">
 		    <input :id="`search-${index}`"
 			   class="card w-100"
