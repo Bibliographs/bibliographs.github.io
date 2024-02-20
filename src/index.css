@@ -2,6 +2,42 @@
     text-align: center;
 }
 
+.center-btn {
+    display: block;
+    margin: auto;
+}
+
+.concept-radio-or {
+    margin-left: 20px;
+}
+
+.concept-radio-and {
+    margin-left: 10px;
+}
+
+.concept-list {
+    margin-top: 1.5em;
+    padding: 0;
+}
+
+.concept-list li {
+    display: inline;
+    list-style: none;
+}
+
+.concept-list-or li + li::before {
+    content: " OR ";
+}
+
+.concept-list-and li + li::before {
+    content: " AND ";
+}
+
+.concept-list .card {
+    padding: 0.5em;
+    margin-right: 0.3em;
+}
+
 .corpus-too-big {
     border: red 2px solid;
     border-radius: 5px;

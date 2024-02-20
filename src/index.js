@@ -1,12 +1,16 @@
+import '@tarekraafat/autocomplete.js/dist/css/autoComplete.02.css';
 import '@ajusa/lit/src/lit.css';
 import './index.css';
 
 import Alpine from 'alpinejs';
+import autoComplete from '@tarekraafat/autocomplete.js';
 
+import { autoCompleteConceptConfig } from './lib/autocomplete.js';
 import { fetchWorks } from './lib/fetch.js';
 import { processWorks, getFilters, filterData, generateJSONDataURL } from './lib/processing.js';
 import { generateGraph, generateGexfURL } from './lib/graph.js';
 
+window.autoCompleteConceptConfig = autoCompleteConceptConfig;
 window.fetchWorks = fetchWorks;
 window.processWorks = processWorks;
 window.getFilters = getFilters;
@@ -16,11 +20,8 @@ window.generateGexfURL = generateGexfURL;
 window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
-  query: '',
-  queryconcept: '',
-  fromYear: 1900,
-  toYear: 2100,
-  maxWorks: 10000,
+  params: [{type: 'titleabs', value: ''}],
+  maxWorks: 1000,
   state: 'search',
   nextState: '',
   loadingMsg: '',
@@ -43,6 +44,8 @@ Alpine.data('App', () => ({
 
 window.Alpine = Alpine;
 Alpine.start();
+
+window.autoComplete = autoComplete;
 
 if (!window.IS_PRODUCTION)
   new EventSource('/esbuild').addEventListener('change', () => location.reload());

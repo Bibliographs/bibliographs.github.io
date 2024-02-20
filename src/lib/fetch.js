@@ -1,22 +1,53 @@
 window.perPage = 200;
 
-export const fetchWorks = async (query, queryconcept, fromYear, toYear, maxWorks) => {
+const toQueryParams = (params) => {
+  const queryParams = {};
+
+  for (const param of params) {
+    if (param.type === 'date') {
+      queryParams.fromYear = param.fromYear;
+      queryParams.toYear = param.toYear;
+    } else if (param.type === 'concept') {
+      const op = param.op === 'or' ? '|' : ' ';
+      const conceptsIds = param.concepts.map((concept) => concept.id.substring(concept.id.lastIndexOf('/') + 1));
+      queryParams.concepts = conceptsIds.join(op);
+    } else {
+      queryParams[param.type] = param.value;
+    }
+  }
+
+  return queryParams;
+};
+
+export const fetchWorks = async (params, maxWorks) => {
+  const qp = toQueryParams(params);
   let works = [];
   let count = 0;
   
-  if (query !== '' || queryconcept !== '') {
+  if (qp.title || qp.titleabs ||
+      qp.titleabsfull || qp.concepts) {
     const filters = [];
     const numReq = Math.ceil(maxWorks / perPage);
 
-    filters.push(`from_publication_date:${fromYear}-01-01`);
-    filters.push(`to_publication_date:${toYear}-12-31`);
-
-    if (query !== '') {
-      filters.push(`default.search:${query}`);
+    if (qp.fromYear) {
+      filters.push(`from_publication_date:${qp.fromYear}-01-01`);
+    }
+    if (qp.toYear) {
+      filters.push(`to_publication_date:${qp.toYear}-12-31`);
     }
 
-    if (queryconcept !== '') {
-      filters.push(`concepts.id:${queryconcept}`);
+    if (qp.title) {
+      filters.push(`title.search:${qp.title}`);
+    }
+    if (qp.titleabs) {
+      filters.push(`title_and_abstract.search:${qp.titleabs}`);
+    }
+    if (qp.titleabsfull) {
+      filters.push(`default.search:${qp.titleabsfull}`);
+    }
+
+    if (qp.concepts) {
+      filters.push(`concepts.id:${qp.concepts}`);
     }
 
     works = await Promise.all([...Array(numReq).keys()].map(async (i) => {
@@ -30,7 +61,7 @@ export const fetchWorks = async (query, queryconcept, fromYear, toYear, maxWorks
             mailto: `****@****.com`,
             "per-page": perPage,
 	    page: i+1,
-	  }));
+	  }).toString());
 	if (!response.ok) {
 	  throw new Error("Network response was not OK");
 	}
