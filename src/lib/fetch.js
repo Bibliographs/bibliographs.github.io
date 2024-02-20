@@ -8,7 +8,6 @@ const toQueryParams = (params) => {
       queryParams.fromYear = param.fromYear;
       queryParams.toYear = param.toYear;
     } else if (param.type === 'concept') {
-      console.log(param.concepts);
       const op = param.op === 'or' ? '|' : ' ';
       const conceptsIds = param.concepts.map((concept) => concept.id.substring(concept.id.lastIndexOf('/') + 1));
       queryParams.concepts = conceptsIds.join(op);
