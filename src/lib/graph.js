@@ -27,9 +27,10 @@ export const generateGraph = (data) => {
   // Step 1: Create the map background (refs)
 
   console.time('add refs nodes');
-  Object.entries(data['refs']).forEach(([id, {count, label}]) => {
+  Object.entries(data['refs']).forEach(([id, {count, label, title}]) => {
     graph.addNode(id, {
       label,
+      title,
       size: Math.sqrt(maxRefNodeSize * count / data.maxCounts.refs),
       color: fieldColors['refs'],
       count,
@@ -92,7 +93,7 @@ export const generateGraph = (data) => {
   }
 
   for (const field of metadataFields) {
-    for (const [id, {count, label}] of Object.entries(data[field])) {
+    for (const [id, {count, label, title}] of Object.entries(data[field])) {
       graph.addNode(id, {
 	label,
 	size: Math.sqrt(maxMetadataNodeSize * count / data.maxCounts[field]),
@@ -100,6 +101,10 @@ export const generateGraph = (data) => {
 	count,
 	dataType: field,
       });
+
+      if (title) {
+	graph.mergeNodeAttributes(id, {title});
+      }
 
       // Get the list of works containing that metadata
       const works = Object.entries(data.sets[field]).filter(([workId, fieldSet]) => fieldSet.has(id)).map(([workId,]) => workId);

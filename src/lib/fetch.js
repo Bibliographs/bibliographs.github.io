@@ -79,11 +79,11 @@ export const fetchWorks = async (params, maxWorks) => {
   return {count, works};
 };
 
-export const fetchRefsLabels = async (openalexIds) => {
+export const fetchRefsLabels = async (openalexIds, maxRefs = 500) => {
+  // We'll only fetch the labels for the first maxRefs refs
   if (openalexIds.length === 0) return [];
 
   const refsPerPage = 50;
-  const maxRefs = 500; // We'll only fetch the labels for the first maxRefs refs
   const ids = [...openalexIds.slice(0, maxRefs)]; // Copy the array to prevent its destruction
   const numReq = Math.ceil(ids.length / refsPerPage);
 
@@ -95,7 +95,7 @@ export const fetchRefsLabels = async (openalexIds) => {
       const response = await fetch(
         "https://api.openalex.org/works?" + new URLSearchParams({
 	  filter: `openalex:${idsStr}`,
-	  select: "id,display_name",
+	  select: "id,title,authorships,publication_year",
           mailto: `****@****.com`,
           "per-page": perPage,
 	  page: 1,

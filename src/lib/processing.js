@@ -21,12 +21,16 @@ export const processWorks = (works) => {
       data.sets[field][work.id] = new Set();
     }
 
-    data.works[`work-${work.id}`] = {count: work.cited_by_count, label: work.title};
+    let label = work.authorships.slice(0, 3).map((authorship) => authorship.author.display_name).join(', ');
+    if (work.authorships.length > 3) {
+      label += ' et al.';
+    }
+    label += `, ${work.publication_year}`;
+    data.works[`work-${work.id}`] = {count: work.cited_by_count, title: work.title, label};
     data.sets.works[work.id].add(`work-${work.id}`);
 
     work.referenced_works.forEach((ref) => {
       incOrCreate(data.refs, ref, 'count');
-      data.refs[ref].label = ref;
     });
     data.sets.refs[work.id] = new Set(work.referenced_works);
 
@@ -161,11 +165,17 @@ export const filterData = async (data, filters) => {
 
   filteredData.maxCounts.refs = filteredRefs.reduce((acc, [, {count}]) => Math.max(acc, count), 0);
 
-  // Get the refs labels
+  // Create the refs labels
   console.time('label refs');
-  const refsLabels = await fetchRefsLabels(filteredRefs.map(([id,]) => id));
-  for (const {id, display_name} of refsLabels) {
-    filteredData.refs[id].label = display_name;
+  const refsLabels = await fetchRefsLabels(filteredRefs.map(([id,]) => id), 50);
+  for (const {id, title, authorships, publication_year} of refsLabels) {
+    let label = authorships.slice(0, 3).map((authorship) => authorship.author.display_name).join(', ');
+    if (authorships.length > 3) {
+      label += ' et al.';
+    }
+    label += `, ${publication_year}`;
+    filteredData.refs[id].label = label;
+    filteredData.refs[id].title = title;
   }
   console.timeEnd('label refs');
 
