@@ -26,7 +26,6 @@ export const processWorks = (works) => {
 
     work.referenced_works.forEach((ref) => {
       incOrCreate(data.refs, ref, 'count');
-      data.refs[ref].label = ref;
     });
     data.sets.refs[work.id] = new Set(work.referenced_works);
 
@@ -163,7 +162,7 @@ export const filterData = async (data, filters) => {
 
   // Get the refs labels
   console.time('label refs');
-  const refsLabels = await fetchRefsLabels(filteredRefs.map(([id,]) => id));
+  const refsLabels = await fetchRefsLabels(filteredRefs.map(([id,]) => id), 50);
   for (const {id, display_name} of refsLabels) {
     filteredData.refs[id].label = display_name;
   }
