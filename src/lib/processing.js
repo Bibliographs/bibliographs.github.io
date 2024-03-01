@@ -116,7 +116,18 @@ export const getFilters = (data) => {
       threshold = 25;
       break;
     }
-    filters[field].value = filters[field].counts.findIndex((el) => el >= threshold);
+
+    // Get the filter value closest to the threshold
+    let idxAbove = filters[field].counts.findIndex((el) => el >= threshold);
+    let idxBelow = filters[field].counts.findLastIndex((el) => el < threshold);
+    let diffAbove = Math.abs(threshold - filters[field].counts[idxAbove]);
+    let diffBelow = Math.abs(threshold - filters[field].counts[idxBelow]);
+    filters[field].value = diffAbove < diffBelow ? idxAbove : idxBelow;
+
+    if (field === 'refs') {
+      // We want at least 2 occurences of refs by default
+      filters[field].value = Math.min(filters[field].value, filters[field].counts.length - 2);
+    }
   });
 
   return filters;
