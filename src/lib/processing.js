@@ -21,7 +21,12 @@ export const processWorks = (works) => {
       data.sets[field][work.id] = new Set();
     }
 
-    data.works[`work-${work.id}`] = {count: work.cited_by_count, label: work.title};
+    let label = work.authorships.slice(0, 3).map((authorship) => authorship.author.display_name).join(', ');
+    if (work.authorships.length > 3) {
+      label += ' et al.';
+    }
+    label += `, ${work.publication_year}`;
+    data.works[`work-${work.id}`] = {count: work.cited_by_count, title: work.title, label};
     data.sets.works[work.id].add(`work-${work.id}`);
 
     work.referenced_works.forEach((ref) => {
