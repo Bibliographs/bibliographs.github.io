@@ -96,8 +96,38 @@ export const getFilters = (data) => {
       return acc;
     }, {lowerBounds: [], counts: [0]});
 
-    // Initialize de value of the filters
-    filters[field].value = field == 'refs' ? filters[field].counts.length - 2 : 0;
+    // Initialize the value of the filters
+    let threshold = 0;
+    switch (field) {
+    case 'refs':
+      threshold = 5000;
+      break;
+    case 'concepts':
+      threshold = 200;
+      break;
+    case 'works':
+    case 'authors':
+    case 'institutions':
+    case 'sources':
+      threshold = 50;
+      break;
+    case 'countries':
+    case 'funders':
+      threshold = 25;
+      break;
+    }
+
+    // Get the filter value closest to the threshold
+    let idxAbove = filters[field].counts.findIndex((el) => el >= threshold);
+    let idxBelow = filters[field].counts.findLastIndex((el) => el < threshold);
+    let diffAbove = Math.abs(threshold - filters[field].counts[idxAbove]);
+    let diffBelow = Math.abs(threshold - filters[field].counts[idxBelow]);
+    filters[field].value = diffAbove < diffBelow ? idxAbove : idxBelow;
+
+    if (field === 'refs') {
+      // We want at least 2 occurences of refs by default
+      filters[field].value = Math.min(filters[field].value, filters[field].counts.length - 2);
+    }
   });
 
   return filters;
