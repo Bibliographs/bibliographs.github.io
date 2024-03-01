@@ -96,8 +96,27 @@ export const getFilters = (data) => {
       return acc;
     }, {lowerBounds: [], counts: [0]});
 
-    // Initialize de value of the filters
-    filters[field].value = field == 'refs' ? filters[field].counts.length - 2 : 0;
+    // Initialize the value of the filters
+    let threshold = 0;
+    switch (field) {
+    case 'refs':
+      threshold = 5000;
+      break;
+    case 'concepts':
+      threshold = 200;
+      break;
+    case 'works':
+    case 'authors':
+    case 'institutions':
+    case 'sources':
+      threshold = 50;
+      break;
+    case 'countries':
+    case 'funders':
+      threshold = 25;
+      break;
+    }
+    filters[field].value = filters[field].counts.findIndex((el) => el >= threshold);
   });
 
   return filters;
