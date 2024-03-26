@@ -84,7 +84,8 @@
 		  <option value="title" >Search in title</option>
 		  <option value="titleabs" >Search in title and abstract</option>
 		  <option value="titleabsfull" >Search in title, abstract and full text</option>
-		  <option value="concept" >Filter by concept</option>
+		  <option value="concept" >Filter by concepts</option>
+		  <option value="topic" >Filter by topics</option>
 		</select>
 		<button type="button" @click.prevent="params.splice(index, 1)">X</button>
 
@@ -141,6 +142,44 @@
 		       x-init="param.concepts = param.concepts || [];
 			       param.op = param.op || 'or';
 			       $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteConceptConfig}))">
+		    <input :id="`search-${index}`"
+			   class="card w-100"
+			   type="search"
+			   x-model="str"
+			   @selection="param.concepts.push($event.detail.selection.value); str='';" />
+		    <input :id="`radio-or-${index}`"
+			   :name="`radio-${index}`"
+			   class="concept-radio-or"
+			   type="radio"
+			   value="or"
+			   x-model="param.op" />
+		    <label :for="`radio-or-${index}`" >OR</label>
+		    <input :id="`radio-and-${index}`"
+			   :name="`radio-${index}`"
+			   class="concept-radio-and"
+			   type="radio"
+			   value="and"
+			   x-model="param.op" />
+		    <label :for="`radio-and-${index}`" >AND</label>
+
+		    <ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'" class="concept-list">
+		      <template x-for="(concept, i) in param.concepts">
+			<li>
+			  <span class="card">
+			    <span x-text="concept.display_name"></span>
+			    |
+			    <a href="#" @click.prevent='param.concepts.splice(i, 1)'>x</a>
+			  </span>
+			</li>
+		      </template>
+		    </ul>
+		  </div>
+		</template>
+		<template x-if="param.type === 'topic'">
+		  <div x-data="{ ac: null, str: '' }"
+		       x-init="param.concepts = param.concepts || [];
+			       param.op = param.op || 'or';
+			       $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteTopicConfig}))">
 		    <input :id="`search-${index}`"
 			   class="card w-100"
 			   type="search"
