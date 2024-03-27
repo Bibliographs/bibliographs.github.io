@@ -22,6 +22,7 @@ window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
   params: [{type: 'titleabs', value: ''}],
+  apiUrl: '',
   maxWorks: 1000,
   state: 'search',
   nextState: '',

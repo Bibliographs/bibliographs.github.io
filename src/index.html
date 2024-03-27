@@ -69,163 +69,191 @@
 	    <span>most cited works</span>
 	</div>
 	<br />
-	<form @submit.prevent="
-			       loading('corpus', 'Fetching corpus from OpenAlex API');
-			       ({count, works} = await fetchWorks(params, maxWorks));
-			       done();" >
-	  <div class="card">
-	    <template x-for="(param, index) in params">
-	      <div>
-		<label :for="`type-${index}`" >
-		  Type:
-		</label>
-		<select :id="`type-${index}`" x-model="param.type">
-		  <option value="date" >Filter by date range</option>
-		  <option value="title" >Search in title</option>
-		  <option value="titleabs" >Search in title and abstract</option>
-		  <option value="titleabsfull" >Search in title, abstract and full text</option>
-		  <option value="concept" >Filter by concepts</option>
-		  <option value="topic" >Filter by topics</option>
-		</select>
-		<button type="button" @click.prevent="params.splice(index, 1)">X</button>
+	<div x-data="{tab: 'search'}" >
+	  <button class="btn" :class="tab === 'search' && 'primary'" @click="tab = 'search'">Search Interface</button>
+	  <button class="btn" :class="tab === 'url' && 'primary'" @click="tab = 'url'">OpenAlex API URL</button> 
+	  <template x-if="tab === 'url'">
+	    <form @submit.prevent="
+				   loading('corpus', 'Fetching corpus from OpenAlex API');
+				   works = await fetchWorksFromUrl(apiUrl, maxWorks));
+				   done();
+				   loading('filters', 'Processing corpus data');
+				   setTimeout(() => {
+				     data = processWorks(works);
+				     filters = getFilters(data);
+				     done();
+				   }, 10);" >
+	      <textarea id="apiurl"
+		     class="card w-100"
+		     placeholder="Paste the OpenAlex API URL here..."
+		     type="text"
+		     x-model="apiUrl" ></textarea>
+	      <button class="btn center-btn primary"
+		      style="margin-top: 0.5em;">
+		Fetch Corpus
+	      </button>
+	    </form>
+	  </template>
+	  <template x-if="tab === 'search'">
+	    <form @submit.prevent="
+				   loading('corpus', 'Fetching corpus from OpenAlex API');
+				   ({count, works} = await fetchWorks(params, maxWorks));
+				   done();" >
+	      <div class="card">
+		<template x-for="(param, index) in params">
+		  <div>
+		    <label :for="`type-${index}`" >
+		      Type:
+		    </label>
+		    <select :id="`type-${index}`" x-model="param.type">
+		      <option value="date" >Filter by date range</option>
+		      <option value="title" >Search in title</option>
+		      <option value="titleabs" >Search in title and abstract</option>
+		      <option value="titleabsfull" >Search in title, abstract and full text</option>
+		      <option value="concept" >Filter by concepts</option>
+		      <option value="topic" >Filter by topics</option>
+		    </select>
+		    <button type="button" @click.prevent="params.splice(index, 1)">X</button>
 
-		<template x-if="param.type === 'date'">
-		  <div>
-		    <span>From</span>
-		    <input
-		      :id="`from-${index}`"
-		      class="card"
-		      placeholder="Enter a year. E.g. 2008"
-		      type="number"
-		      x-model="param.fromYear" />
-		    <span>to</span>
-		    <input
-		      :id="`to-${index}`"
-		      class="card"
-		      placeholder="Enter a year. E.g. 2008"
-		      type="number"
-		      x-model="param.toYear" />
-		  </div>
-		</template>
-		<template x-if="param.type === 'title'">
-		  <div>
-		    <input :id="`value-${index}`"
-			   class="card w-100"
-			   placeholder="Search for words in works' title"
-			   type="search"
-			   x-model="param.value" />
-		    <a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
-		  </div>
-		</template>
-		<template x-if="param.type === 'titleabs'">
-		  <div>
-		    <input :id="`value-${index}`"
-			   class="card w-100"
-			   placeholder="Search for words in works' title and abstract"
-			   type="search"
-			   x-model="param.value" />
-		    <a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
-		  </div>
-		</template>
-		<template x-if="param.type === 'titleabsfull'">
-		  <div>
-		    <input :id="`value-${index}`"
-			   class="card w-100"
-			   placeholder="Search for words in works' title, abstract and full-text"
-			   type="search"
-			   x-model="param.value" />
-		    <a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
-		  </div>
-		</template>
-		<template x-if="param.type === 'concept'">
-		  <div x-data="{ ac: null, str: '' }"
-		       x-init="param.concepts = param.concepts || [];
-			       param.op = param.op || 'or';
-			       $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteConceptConfig}))">
-		    <input :id="`search-${index}`"
-			   class="card w-100"
-			   type="search"
-			   x-model="str"
-			   @selection="param.concepts.push($event.detail.selection.value); str='';" />
-		    <input :id="`radio-or-${index}`"
-			   :name="`radio-${index}`"
-			   class="concept-radio-or"
-			   type="radio"
-			   value="or"
-			   x-model="param.op" />
-		    <label :for="`radio-or-${index}`" >OR</label>
-		    <input :id="`radio-and-${index}`"
-			   :name="`radio-${index}`"
-			   class="concept-radio-and"
-			   type="radio"
-			   value="and"
-			   x-model="param.op" />
-		    <label :for="`radio-and-${index}`" >AND</label>
+		    <template x-if="param.type === 'date'">
+		      <div>
+			<span>From</span>
+			<input
+			  :id="`from-${index}`"
+			  class="card"
+			  placeholder="Enter a year. E.g. 2008"
+			  type="number"
+			  x-model="param.fromYear" />
+			<span>to</span>
+			<input
+			  :id="`to-${index}`"
+			  class="card"
+			  placeholder="Enter a year. E.g. 2008"
+			  type="number"
+			  x-model="param.toYear" />
+		      </div>
+		    </template>
+		    <template x-if="param.type === 'title'">
+		      <div>
+			<input :id="`value-${index}`"
+			       class="card w-100"
+			       placeholder="Search for words in works' title"
+			       type="search"
+			       x-model="param.value" />
+			<a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
+		      </div>
+		    </template>
+		    <template x-if="param.type === 'titleabs'">
+		      <div>
+			<input :id="`value-${index}`"
+			       class="card w-100"
+			       placeholder="Search for words in works' title and abstract"
+			       type="search"
+			       x-model="param.value" />
+			<a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
+		      </div>
+		    </template>
+		    <template x-if="param.type === 'titleabsfull'">
+		      <div>
+			<input :id="`value-${index}`"
+			       class="card w-100"
+			       placeholder="Search for words in works' title, abstract and full-text"
+			       type="search"
+			       x-model="param.value" />
+			<a href="https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/search-entities#boolean-searches">Note that you can use boolean search in this field</a>
+		      </div>
+		    </template>
+		    <template x-if="param.type === 'concept'">
+		      <div x-data="{ ac: null, str: '' }"
+			   x-init="param.concepts = param.concepts || [];
+				   param.op = param.op || 'or';
+				   $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteConceptConfig}))">
+			<input :id="`search-${index}`"
+			       class="card w-100"
+			       type="search"
+			       x-model="str"
+			       @selection="param.concepts.push($event.detail.selection.value); str='';" />
+			<input :id="`radio-or-${index}`"
+			       :name="`radio-${index}`"
+			       class="concept-radio-or"
+			       type="radio"
+			       value="or"
+			       x-model="param.op" />
+			<label :for="`radio-or-${index}`" >OR</label>
+			<input :id="`radio-and-${index}`"
+			       :name="`radio-${index}`"
+			       class="concept-radio-and"
+			       type="radio"
+			       value="and"
+			       x-model="param.op" />
+			<label :for="`radio-and-${index}`" >AND</label>
 
-		    <ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'" class="concept-list">
-		      <template x-for="(concept, i) in param.concepts">
-			<li>
-			  <span class="card">
-			    <span x-text="concept.display_name"></span>
-			    |
-			    <a href="#" @click.prevent='param.concepts.splice(i, 1)'>x</a>
-			  </span>
-			</li>
-		      </template>
-		    </ul>
-		  </div>
-		</template>
-		<template x-if="param.type === 'topic'">
-		  <div x-data="{ ac: null, str: '' }"
-		       x-init="param.concepts = param.concepts || [];
-			       param.op = param.op || 'or';
-			       $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteTopicConfig}))">
-		    <input :id="`search-${index}`"
-			   class="card w-100"
-			   type="search"
-			   x-model="str"
-			   @selection="param.concepts.push($event.detail.selection.value); str='';" />
-		    <input :id="`radio-or-${index}`"
-			   :name="`radio-${index}`"
-			   class="concept-radio-or"
-			   type="radio"
-			   value="or"
-			   x-model="param.op" />
-		    <label :for="`radio-or-${index}`" >OR</label>
-		    <input :id="`radio-and-${index}`"
-			   :name="`radio-${index}`"
-			   class="concept-radio-and"
-			   type="radio"
-			   value="and"
-			   x-model="param.op" />
-		    <label :for="`radio-and-${index}`" >AND</label>
+			<ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'" class="concept-list">
+			  <template x-for="(concept, i) in param.concepts">
+			    <li>
+			      <span class="card">
+				<span x-text="concept.display_name"></span>
+				|
+				<a href="#" @click.prevent='param.concepts.splice(i, 1)'>x</a>
+			      </span>
+			    </li>
+			  </template>
+			</ul>
+		      </div>
+		    </template>
+		    <template x-if="param.type === 'topic'">
+		      <div x-data="{ ac: null, str: '' }"
+			   x-init="param.concepts = param.concepts || [];
+				   param.op = param.op || 'or';
+				   $nextTick(() => ac = new autoComplete({selector: `#search-${index}`, ...autoCompleteTopicConfig}))">
+			<input :id="`search-${index}`"
+			       class="card w-100"
+			       type="search"
+			       x-model="str"
+			       @selection="param.concepts.push($event.detail.selection.value); str='';" />
+			<input :id="`radio-or-${index}`"
+			       :name="`radio-${index}`"
+			       class="concept-radio-or"
+			       type="radio"
+			       value="or"
+			       x-model="param.op" />
+			<label :for="`radio-or-${index}`" >OR</label>
+			<input :id="`radio-and-${index}`"
+			       :name="`radio-${index}`"
+			       class="concept-radio-and"
+			       type="radio"
+			       value="and"
+			       x-model="param.op" />
+			<label :for="`radio-and-${index}`" >AND</label>
 
-		    <ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'" class="concept-list">
-		      <template x-for="(concept, i) in param.concepts">
-			<li>
-			  <span class="card">
-			    <span x-text="concept.display_name"></span>
-			    |
-			    <a href="#" @click.prevent='param.concepts.splice(i, 1)'>x</a>
-			  </span>
-			</li>
-		      </template>
-		    </ul>
+			<ul :class="param.op === 'or' ? 'concept-list-or' : 'concept-list-and'" class="concept-list">
+			  <template x-for="(concept, i) in param.concepts">
+			    <li>
+			      <span class="card">
+				<span x-text="concept.display_name"></span>
+				|
+				<a href="#" @click.prevent='param.concepts.splice(i, 1)'>x</a>
+			      </span>
+			    </li>
+			  </template>
+			</ul>
+		      </div>
+		    </template>
 		  </div>
 		</template>
+
+		<button type="button" class="btn center-btn"
+			@click.prevent="params.push({type: 'date', fromYear: 1900, toYear: 2100})">
+		  Add query param
+		</button>
 	      </div>
-	    </template>
 
-	    <button type="button" class="btn center-btn"
-		    @click.prevent="params.push({type: 'date', fromYear: 1900, toYear: 2100})">
-	      Add query param
-	    </button>
-	  </div>
-
-	  <button class="btn primary" >
-	    Fetch Corpus
-	  </button>
-	</form>
+	      <button class="btn primary" >
+		Fetch Corpus
+	      </button>
+	    </form>
+	  </template>
+	</div>
       </main>
     </template>
 
