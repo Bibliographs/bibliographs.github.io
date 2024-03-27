@@ -5,12 +5,13 @@ import './index.css';
 import Alpine from 'alpinejs';
 import autoComplete from '@tarekraafat/autocomplete.js';
 
-import { autoCompleteConceptConfig } from './lib/autocomplete.js';
+import { autoCompleteConceptConfig, autoCompleteTopicConfig } from './lib/autocomplete.js';
 import { fetchWorks } from './lib/fetch.js';
 import { processWorks, getFilters, filterData, generateJSONDataURL } from './lib/processing.js';
 import { generateGraph, generateGexfURL } from './lib/graph.js';
 
 window.autoCompleteConceptConfig = autoCompleteConceptConfig;
+window.autoCompleteTopicConfig = autoCompleteTopicConfig;
 window.fetchWorks = fetchWorks;
 window.processWorks = processWorks;
 window.getFilters = getFilters;
