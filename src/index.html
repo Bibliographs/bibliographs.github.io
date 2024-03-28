@@ -66,7 +66,7 @@
 	      min="1"
 	      max="10000"
 	      x-model="maxWorks" />
-	    <span>most cited works</span>
+	    <span>works.</span>
 	</div>
 	<br />
 	<div x-data="{tab: 'search'}" >
@@ -75,7 +75,7 @@
 	  <template x-if="tab === 'url'">
 	    <form @submit.prevent="
 				   loading('corpus', 'Fetching corpus from OpenAlex API');
-				   works = await fetchWorksFromUrl(apiUrl, maxWorks));
+				   works = await fetchWorksFromUrl(apiUrl, maxWorks);
 				   done();
 				   loading('filters', 'Processing corpus data');
 				   setTimeout(() => {
@@ -84,10 +84,12 @@
 				     done();
 				   }, 10);" >
 	      <textarea id="apiurl"
-		     class="card w-100"
-		     placeholder="Paste the OpenAlex API URL here..."
-		     type="text"
-		     x-model="apiUrl" ></textarea>
+			class="card w-100"
+			placeholder="Paste the OpenAlex API URL here..."
+			type="text"
+			x-model="apiUrl"
+			@input="checkApiUrl(apiUrl) ? $el.setCustomValidity('') : $el.setCustomValidity('URL is invalid, it needs to look like: https://api.openalex.org/works?...');"
+			required ></textarea>
 	      <button class="btn center-btn primary"
 		      style="margin-top: 0.5em;">
 		Fetch Corpus
