@@ -85,6 +85,7 @@ export const checkApiUrl = (url) => {
 
 export const fetchWorksFromUrl = async (url, maxWorks) => {
   let works = [];
+  let count = 0;
   const numReq = Math.ceil(maxWorks / perPage);
 
   const urlObj = new URL(url);
@@ -107,6 +108,7 @@ export const fetchWorksFromUrl = async (url, maxWorks) => {
 	throw new Error("Network response was not OK");
       }
       data = await response.json();
+      count = data.meta.count;
     } catch (e) {
       console.error(`Error while fetching works:\n\t${e}`);
     }
@@ -114,7 +116,7 @@ export const fetchWorksFromUrl = async (url, maxWorks) => {
   }));
 
   works = works.flat().slice(0, maxWorks).filter(work => work);
-  return works;
+  return {count, works};
 };
 
 export const fetchRefsLabels = async (openalexIds, maxRefs = 500) => {

@@ -75,14 +75,8 @@
 	  <template x-if="tab === 'url'">
 	    <form @submit.prevent="
 				   loading('corpus', 'Fetching corpus from OpenAlex API');
-				   works = await fetchWorksFromUrl(apiUrl, maxWorks);
-				   done();
-				   loading('filters', 'Processing corpus data');
-				   setTimeout(() => {
-				     data = processWorks(works);
-				     filters = getFilters(data);
-				     done();
-				   }, 10);" >
+				   ({count, works} = await fetchWorksFromUrl(apiUrl, maxWorks));
+				   done();" >
 	      <textarea id="apiurl"
 			class="card w-100"
 			placeholder="Paste the OpenAlex API URL here..."
