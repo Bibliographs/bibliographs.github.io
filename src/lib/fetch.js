@@ -79,6 +79,44 @@ export const fetchWorks = async (params, maxWorks) => {
   return {count, works};
 };
 
+export const checkApiUrl = (url) => {
+  return url.startsWith("https://api.openalex.org/works?");
+};
+
+export const fetchWorksFromUrl = async (url, maxWorks) => {
+  let works = [];
+  const numReq = Math.ceil(maxWorks / perPage);
+
+  const urlObj = new URL(url);
+  const filter = urlObj.searchParams.get("filter");
+  const sort = urlObj.searchParams.get("sort");
+
+  works = await Promise.all([...Array(numReq).keys()].map(async (i) => {
+    let data = {};
+    try {
+      const response = await fetch(
+        "https://api.openalex.org/works?" + new URLSearchParams({
+	  filter,
+	  sort,
+	  select: "id,title,publication_year,primary_location,authorships,concepts,locations,grants,referenced_works,cited_by_count",
+          mailto: `****@****.com`,
+          "per-page": perPage,
+	  page: i+1,
+	}).toString());
+      if (!response.ok) {
+	throw new Error("Network response was not OK");
+      }
+      data = await response.json();
+    } catch (e) {
+      console.error(`Error while fetching works:\n\t${e}`);
+    }
+    return data.results;
+  }));
+
+  works = works.flat().slice(0, maxWorks).filter(work => work);
+  return works;
+};
+
 export const fetchRefsLabels = async (openalexIds, maxRefs = 500) => {
   // We'll only fetch the labels for the first maxRefs refs
   if (openalexIds.length === 0) return [];

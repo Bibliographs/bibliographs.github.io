@@ -6,13 +6,15 @@ import Alpine from 'alpinejs';
 import autoComplete from '@tarekraafat/autocomplete.js';
 
 import { autoCompleteConceptConfig, autoCompleteTopicConfig } from './lib/autocomplete.js';
-import { fetchWorks } from './lib/fetch.js';
+import { checkApiUrl, fetchWorks, fetchWorksFromUrl } from './lib/fetch.js';
 import { processWorks, getFilters, filterData, generateJSONDataURL } from './lib/processing.js';
 import { generateGraph, generateGexfURL } from './lib/graph.js';
 
 window.autoCompleteConceptConfig = autoCompleteConceptConfig;
 window.autoCompleteTopicConfig = autoCompleteTopicConfig;
+window.checkApiUrl = checkApiUrl;
 window.fetchWorks = fetchWorks;
+window.fetchWorksFromUrl = fetchWorksFromUrl;
 window.processWorks = processWorks;
 window.getFilters = getFilters;
 window.filterData = filterData;
@@ -22,7 +24,8 @@ window.generateJSONDataURL = generateJSONDataURL;
 
 Alpine.data('App', () => ({
   params: [{type: 'titleabs', value: ''}],
-  maxWorks: 1000,
+  apiUrl: '',
+  maxWorks: 10000,
   state: 'search',
   nextState: '',
   loadingMsg: '',
