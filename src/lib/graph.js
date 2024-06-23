@@ -113,10 +113,12 @@ export const generateGraph = (data) => {
       for (const work of works) {
 	if (typeof data.sets.refs[work] !== 'undefined') {
 	  for (const ref of data.sets.refs[work]) {
-	    graph.updateEdge(id, ref, attr => ({
-	      ...attr,
-	      weight: (attr.weight || 0) + 1,
-	    }));
+	    if (graph.hasNode(ref)) {
+	      graph.updateEdge(id, ref, attr => ({
+		...attr,
+		weight: (attr.weight || 0) + 1,
+	      }));
+	    }
 	  }
 	}
       }
