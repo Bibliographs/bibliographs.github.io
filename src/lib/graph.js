@@ -10,10 +10,10 @@ export const fieldColors = {
   works: "#202020",
   authors: "#ffe915",
   sources: "#a7d30d",
-  concepts: "#9dabf5",
   institutions: "#e22521",
   countries: "#df60bf",
   funders: "#ff8f2e",
+  concepts: "#9dabf5",
 };
 
 export const fields = Object.keys(fieldColors);
