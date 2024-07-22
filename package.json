@@ -1,5 +1,5 @@
 {
-  "name": "bibliograph2",
+  "name": "bibliograph",
   "version": "0.1.0",
   "description": "",
   "main": "src/index.js",
@@ -22,6 +22,7 @@
     "prettier": "^3.3.3"
   },
   "dependencies": {
+    "@ajusa/lit": "^1.1.0",
     "file-saver": "^2.0.5",
     "graphology": "^0.25.4",
     "graphology-components": "^1.5.4",

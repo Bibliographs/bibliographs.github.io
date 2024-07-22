@@ -1,12 +1,12 @@
 import van from "vanjs-core";
 import { navigate } from "vanjs-routing";
-import { pageStyle } from "@/lib/utils";
 import { fetchWorks, fetchWorksProgress } from "@/lib/fetch";
 import { corpus, filters } from "@/global_state";
 import { processWorks, getFilters } from "@/lib/processing";
 import ProgressBar from "@/components/progressbar";
+import { pageStyle } from "@/lib/utils";
 
-const { main, iframe, button, div, form, input, h1, p } = van.tags;
+const { main, iframe, div, form, input, label, h1, p } = van.tags;
 
 const urlRegex = /^https:\/\/api\.openalex\.org\/.*$/;
 const isValidURL = (url) => {
@@ -19,26 +19,34 @@ const cleanURL = (url) => {
 };
 
 const Search = () => {
-  pageStyle(`
-  input.url {
-  width: 80%;
-  }
-  `);
+  pageStyle(``);
 
   const url = van.state(localStorage.getItem("openalexUrl") || "");
   van.derive(() => localStorage.setItem("openalexUrl", url.val));
 
+  const showProgress = van.state(false);
+  const FetchWorksProgressBar = ProgressBar(
+    fetchWorksProgress,
+    "Downloading... ",
+  );
+
   return main(
-    h1("1. Define your corpus"),
+    { class: "c" },
+    h1({ class: "center" }, "1. Define your corpus"),
     p(
-      "For large corpuses, only the 10.000 most cited records will be processed",
+      { style: "font-size: 0.85em" },
+      "Use the frame below to search the OpenAlex database and carve out your corpus. Make sure your search retrieves only the publications relevant for your research - for large corpuses, only the 10.000 most cited records will be processed",
     ),
     iframe({
       id: "openalex-frame",
-      width: "80%",
-      height: "500px",
+      width: "100%",
+      height: "450px",
+      style: "border-radius: 15px",
       allow: "clipboard-write",
-      src: "https://openalex.org/?view=api,list,report",
+      src: () =>
+        url.val
+          ? url.val.replace("//api.", "//") + "&view=api,list,report"
+          : "https://openalex.org/?view=api,list,report",
       onmouseleave: async () => {
         const clip = await navigator.clipboard.readText();
         console.log("clip: ", clip, "\nis valid: ", isValidURL(clip));
@@ -48,42 +56,44 @@ const Search = () => {
     }),
     form(
       {
+        style: "margin-top: 0",
         onsubmit: (e) => {
           e.preventDefault();
         },
       },
-      input({
-        class: "url",
-        type: "text",
-        required: true,
-        pattern: urlRegex.toString().slice(1, -1),
-        placeholder: "Please copy the url from the OpenAlex interface...",
-        value: url,
-        oninput: (e) => (url.val = e.target.value),
-      }),
       div(
-        { id: "fetch-log" },
-        "Click on 'Fetch Corpus' button to start downloading the corpus.",
+        { style: () => (showProgress.val ? "" : "visibility: hidden") },
+        FetchWorksProgressBar,
       ),
-      ProgressBar(fetchWorksProgress),
-      input({
-        type: "submit",
-        value: "2. Filters",
-        disabled: () => !isValidURL(url.val),
-        onclick: async () => {
-          const { works } = await fetchWorks(cleanURL(url.rawVal), 100);
-          corpus.val = processWorks(works);
-          filters.val = getFilters(corpus.val);
-          navigate("/filters");
-        },
-      }),
-    ),
-    div(
-      button(
-        {
-          onclick: () => navigate("/"),
-        },
-        "Back",
+      label(
+        { for: "url", style: "font-size: 0.9em" },
+        'Please copy the address provided above in the "API Box" and paste it below:',
+      ),
+      div(
+        { style: "display: flex; justify-content: space-between;" },
+        input({
+          class: "card",
+          style: "width: 80%",
+          type: "text",
+          required: true,
+          pattern: urlRegex.toString().slice(1, -1),
+          placeholder: "Please copy the url from the OpenAlex interface...",
+          value: url,
+          oninput: (e) => (url.val = e.target.value),
+        }),
+        input({
+          class: "btn primary",
+          type: "submit",
+          value: "2. Filters =>",
+          disabled: () => !isValidURL(url.val),
+          onclick: async () => {
+            showProgress.val = true;
+            const { works } = await fetchWorks(cleanURL(url.rawVal), 100);
+            corpus.val = processWorks(works);
+            filters.val = getFilters(corpus.val);
+            navigate("/filters");
+          },
+        }),
       ),
     ),
   );

@@ -1,3 +1,4 @@
+import "@ajusa/lit/src/lit.css";
 import "./index.css";
 
 import van from "vanjs-core";
@@ -10,7 +11,7 @@ import Viz from "./pages/viz";
 
 function App() {
   return Router({
-    basename: "bibliograph2",
+    basename: window.IS_PRODUCTION ? "bibliograph2" : "",
     routes: [
       { path: "/", component: Start },
       { path: "/search", component: Search },

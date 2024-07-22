@@ -1,11 +1,12 @@
 import { filteredCorpus, graph } from "@/global_state";
 import { addMetadataGraph, generateRefGraph } from "@/lib/graph";
-import { saveAsPNG, saveGexf } from "@/lib/utils";
+import { pageStyle, saveAsPNG, saveGexf } from "@/lib/utils";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import Sigma from "sigma";
 import van from "vanjs-core";
+import { navigate } from "vanjs-routing";
 
-const { main, h1, h4, div, button, input, label, span } = van.tags;
+const { main, h1, h4, p, div, button, input, label, span } = van.tags;
 
 function logslider(position) {
   var minp = 0;
@@ -21,7 +22,26 @@ function logslider(position) {
 }
 
 const Viz = () => {
-  const sigmaContainer = div({ style: "width: 100%; height: 500px" }, () =>
+  pageStyle(`
+  .settings {
+    margin: 0;
+  }
+  .settings h4 {
+    margin: 0;
+  }
+  .settings > div:first-child {
+    margin-bottom: .5em;
+  }
+  .settings input[type="range"] {
+    width: 100%;
+  }
+  .settings p {
+    font-size: 0.7em;
+    margin: 0;
+  }
+`);
+
+  const sigmaContainer = div({ id: "sigma" }, () =>
     !graph.val ? "Generate initial background graph first" : "",
   );
 
@@ -73,13 +93,15 @@ const Viz = () => {
       value: van.state(70),
       min: 0,
       max: 100,
-      label: "Scaling (overall graph size)",
+      label: "Scaling",
+      info: "overall graph size",
     },
     gravity: {
       value: van.state(20),
       min: 0,
       max: 100,
-      label: "Gravity (graph compactness)",
+      label: "Gravity",
+      info: "graph compactness",
     },
     labelSize: {
       value: van.state(14),
@@ -141,45 +163,74 @@ const Viz = () => {
   });
 
   return main(
-    h1("3. Visualize the Graph"),
-    sigmaContainer,
-    label(
-      { class: "switch" },
-      input({
-        type: "checkbox",
-        checked: step2Checked,
-        onchange: (e) => (step2Checked.val = e.target.checked),
-      }),
-      span({ class: "slider round" }),
-    ),
-    input({
-      type: "checkbox",
-      checked: layoutRunning,
-      onchange: (e) => (layoutRunning.val = e.target.checked),
-    }),
-    Object.values(settings).map((setting) =>
+    { class: "c" },
+    h1({ class: "center" }, "3. Visualize the Graph"),
+    div(
+      { class: "flex-h", style: "justify-content: space-between" },
+      sigmaContainer,
       div(
-        h4(setting.label),
-        input({
-          type: "range",
-          min: setting.min,
-          max: setting.max,
-          value: setting.value,
-          oninput: (e) => (setting.value.val = Number(e.target.value)),
-        }),
+        { class: "flex-v settings" },
+        div(
+          div(
+            { class: "flex-h", style: "justify-content: space-around" },
+            h4("Step1"),
+            h4("<=>"),
+            h4("Step2"),
+          ),
+          label(
+            { class: "switch" },
+            input({
+              type: "checkbox",
+              checked: step2Checked,
+              onchange: (e) => (step2Checked.val = e.target.checked),
+            }),
+            span({ class: "slider round" }),
+          ),
+        ),
+        div(
+          input({
+            id: "forceatlas2-checkbox",
+            type: "checkbox",
+            checked: layoutRunning,
+            onchange: (e) => (layoutRunning.val = e.target.checked),
+          }),
+          label({ for: "forceatlas2-checkbox" }, "ForceAtlas2 Running"),
+        ),
+        Object.values(settings).map((setting) =>
+          div(
+            h4(setting.label),
+            p(setting.info),
+            input({
+              type: "range",
+              min: setting.min,
+              max: setting.max,
+              value: setting.value,
+              oninput: (e) => (setting.value.val = Number(e.target.value)),
+            }),
+          ),
+        ),
       ),
     ),
-    button(
-      {
-        onclick: () => saveGexf(graph.val),
-      },
-      "Download .gexf",
-    ),
-    button(
-      {
-        onclick: () => saveAsPNG(sigmaInstance),
-      },
-      "Download .png",
+    div(
+      { class: "flex-h", style: "justify-content: space-evenly;width: 70%" },
+      button(
+        { class: "btn", onclick: () => navigate("/filters") },
+        "<= 2. Filters",
+      ),
+      button(
+        {
+          class: "btn primary",
+          onclick: () => saveGexf(graph.val),
+        },
+        "Download .gexf",
+      ),
+      button(
+        {
+          class: "btn primary",
+          onclick: () => saveAsPNG(sigmaInstance),
+        },
+        "Download .png",
+      ),
     ),
   );
 };

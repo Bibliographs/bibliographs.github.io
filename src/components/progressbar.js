@@ -2,19 +2,19 @@ import van from "vanjs-core";
 
 const { div } = van.tags;
 
-const ProgressBar = (progressState) =>
+const ProgressBar = (progressState, label = "") =>
   div(
     {
       class: "progress-container",
-      style: "background-color: lightgray;width: 80%",
+      style: "background-color: lightgray;width: 100%",
     },
     div(
       {
         class: "progress-bar",
         style: () =>
-          `background-color: #2196F3;color: white;height: 24px;width: ${progressState.val}%`,
+          `white-space: nowrap;overflow: visible;background-color: #2196F3;color: white;height: 24px;width: ${progressState.val}%`,
       },
-      () => `${progressState.val}%`,
+      () => `${label}${progressState.val}%`,
     ),
   );
 
