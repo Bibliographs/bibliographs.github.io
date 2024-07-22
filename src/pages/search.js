@@ -88,7 +88,7 @@ const Search = () => {
           disabled: () => !isValidURL(url.val),
           onclick: async () => {
             showProgress.val = true;
-            const { works } = await fetchWorks(cleanURL(url.rawVal), 100);
+            const { works } = await fetchWorks(cleanURL(url.rawVal), 10000);
             corpus.val = processWorks(works);
             filters.val = getFilters(corpus.val);
             navigate("/filters");
