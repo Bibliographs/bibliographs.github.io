@@ -8,18 +8,18 @@ const Start = () => {
   pageStyle(``);
   return main(
     { class: "c" },
-    h1({ class: "center" }, "BiblioGraph"),
+    h1({ class: "center grassetto" }, "BiblioGraph"),
     div(
-      { style: "width: 45em;margin: auto" },
+      { style: "/*width:80em;*/" },
       p(
-        "BiblioGraph allows you turn a corpus of OpenAlex records into a scientometric landscape, composed by:",
+        "BiblioGraph allows you turn a corpus of OpenAlex records into a scientometric landscape, composed of:",
       ),
       ol(
         li(
-          "A base map consisting in the network of references that appear together in the records of the corpus;",
+          "A base map consisting in the network of references that appear together in the records of the corpus",
         ),
         li(
-          "A layer of metadata extracted from the records (authors, sources, subﬁelds...) and positioned according to their co-occurrence with the references of the base map.",
+          "A layer of metadata extracted from the records (authors, sources, subﬁelds...) positioned according to their co-occurrence with the references of the base map",
         ),
       ),
       p(
@@ -32,7 +32,7 @@ const Start = () => {
         style: "margin: auto;margin-top: 5em",
         onclick: () => navigate("/search"),
       },
-      "Start here =>",
+      "Start here ⮕ ",
     ),
     Link(
       {
@@ -47,9 +47,9 @@ const Start = () => {
       br(),
       "Nils Bonﬁls",
       br(),
-      a({ href: "http://www.tommasoventurini.it/wp/" }, "Tommaso Venturini"),
+      a({ href: "http://www.tommasoventurini.it/wp/", target: "_blank" }, "Tommaso Venturini"),
       br(),
-      a({ href: "https://github.com/nbonfils/bibliograph2" }, "Fork on Github"),
+      a({ href: "https://github.com/nbonfils/bibliograph2" , target: "_blank" }, "Fork on Github"),
       br(),
     ),
   );

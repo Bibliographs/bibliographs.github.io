@@ -34,14 +34,12 @@ const Search = () => {
     { class: "c" },
     h1({ class: "center" }, "1. Define your corpus"),
     p(
-      { style: "font-size: 0.85em" },
       "Use the frame below to search the OpenAlex database and carve out your corpus. Make sure your search retrieves only the publications relevant for your research - for large corpuses, only the 10.000 most cited records will be processed",
     ),
     iframe({
       id: "openalex-frame",
       width: "100%",
-      height: "450px",
-      style: "border-radius: 15px",
+      height: "480px",
       allow: "clipboard-write",
       src: () =>
         url.val
@@ -66,14 +64,13 @@ const Search = () => {
         FetchWorksProgressBar,
       ),
       label(
-        { for: "url", style: "font-size: 0.9em" },
+        { for: "url"},
         'Please copy the address provided above in the "API Box" and paste it below:',
       ),
       div(
         { style: "display: flex; justify-content: space-between;" },
         input({
           class: "card",
-          style: "width: 80%",
           type: "text",
           required: true,
           pattern: urlRegex.toString().slice(1, -1),
@@ -84,7 +81,7 @@ const Search = () => {
         input({
           class: "btn primary",
           type: "submit",
-          value: "2. Filters =>",
+          value: "2. Filters ⮕ ",
           disabled: () => !isValidURL(url.val),
           onclick: async () => {
             showProgress.val = true;

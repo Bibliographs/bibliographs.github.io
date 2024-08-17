@@ -70,7 +70,7 @@ const Filters = () => {
       },
       button(
         { class: "btn", onclick: () => navigate("/search") },
-        "<= 1. Corpus",
+        " ⬅︎ 1. Corpus",
       ),
       button(
         {
@@ -80,7 +80,7 @@ const Filters = () => {
             navigate("/viz");
           },
         },
-        "3. Graph =>",
+        "3. Graph ⮕ ",
       ),
     ),
   );
