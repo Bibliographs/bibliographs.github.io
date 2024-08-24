@@ -3,6 +3,7 @@ import { addMetadataGraph, generateRefGraph } from "@/lib/graph";
 import { pageStyle, saveAsPNG, saveGexf } from "@/lib/utils";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import Sigma from "sigma";
+import { EdgeLineProgram } from "sigma/rendering";
 import van from "vanjs-core";
 import { navigate } from "vanjs-routing";
 
@@ -66,6 +67,11 @@ const Viz = () => {
     sigmaInstance = new Sigma(graph.val, sigmaContainer, {
       itemSizesReference: "positions",
       zoomToSizeRatioFunction: (x) => x,
+      defaultEdgeColor: "rgba(204,204,204,0.82)",
+      defaultEdgeType: "thinline",
+      edgeProgramClasses: {
+        thinline: EdgeLineProgram,
+      },
     });
     layout.start();
     layoutRunning.val = true;
