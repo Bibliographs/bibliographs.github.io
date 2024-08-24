@@ -8,7 +8,7 @@ const Start = () => {
   pageStyle(``);
   return main(
     { class: "c" },
-    h1({ class: "center grassetto" }, "BiblioGraph"),
+    h1({ class: "center grassetto" }, "BiblioGraph (pre-release version)"),
     div(
       { style: "/*width:80em;*/" },
       p(
