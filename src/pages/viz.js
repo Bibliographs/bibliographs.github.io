@@ -24,13 +24,15 @@ function logslider(position) {
 const Viz = () => {
   pageStyle(`
   .settings {
-    margin: 0;
+    margin: 0px;
   }
   .settings h4 {
-    margin: 0;
+    margin: 4px 0px 0px 0px;
+    color:#000;
+    font-size:1.2em;
   }
   .settings > div:first-child {
-    margin-bottom: .5em;
+    margin-bottom: 0em;
   }
   .settings input[type="range"] {
     width: 100%;
@@ -174,7 +176,7 @@ const Viz = () => {
           div(
             { class: "flex-h", style: "justify-content: space-around" },
             h4("Step1"),
-            h4("<=>"),
+            h4("⬅︎ ⮕"),
             h4("Step2"),
           ),
           label(
@@ -212,24 +214,24 @@ const Viz = () => {
       ),
     ),
     div(
-      { class: "flex-h", style: "justify-content: space-evenly;width: 70%" },
+      { class: "flex-h", style: "justify-content: space-evenly;width: 35%" },
       button(
         { class: "btn", onclick: () => navigate("/filters") },
-        "<= 2. Filters",
+        " ⬅︎ 2. Filters",
       ),
       button(
         {
           class: "btn primary",
           onclick: () => saveGexf(graph.val),
         },
-        "Download .gexf",
+        ".gexf ⬇",
       ),
       button(
         {
           class: "btn primary",
           onclick: () => saveAsPNG(sigmaInstance),
         },
-        "Download .png",
+        ".png ⬇",
       ),
     ),
   );

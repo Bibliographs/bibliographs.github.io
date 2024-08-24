@@ -1,15 +1,50 @@
+.c {
+    /*max-width: 90em;*/
+    padding: 4em;
+    padding-top:1em;
+}
+
+:root {
+    --font: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+p{
+    margin-left:20px;
+    margin-right:20px;
+}
+
+ol{
+    margin-left:40px;
+}
+
+
+
 h1 {
+    font-family:Courier New, Courier, monospace;
+    color: #000;
     margin-top: 0px;
+    font-size: 3em;
 }
 
 h4 {
     color: #fa0;
-    font-weight: bold;
+    font-weight: normal;
+}
+
+h5 {
+    color: #000;
+    font-size: 1em;
 }
 
 .center {
     text-align: center;
 }
+
+.grassetto {
+    font-weight: bold;
+    font-size: 4em;
+}
+
 
 .center-btn {
     display: block;
@@ -17,22 +52,55 @@ h4 {
 }
 
 .btn {
+    font-size: 1.1em;
     font-weight: bold;
-    margin: 0;
-    border-radius: 10px;
+    margin: 2px 0px 0px 10px;
+    border-radius: 15px;
+    background:#CCC;
+    color:#FFF;
 }
 
 .btn:disabled {
-    background-color: #ccc;
+    background-color: #ddd;
+    border-color: #ddd;
 }
 
 .btn:disabled {
     opacity: 1;
 }
 
+.btn:hover {
+    opacity: 1;
+    background-color: #005DA4;
+    border-color: #005DA4;
+}
+
+a:hover {
+    opacity: 1;
+    color: #005DA4;
+}
+
 .credits {
     text-align: right;
     font-size: 0.8em;
+    line-height: 1.2em;
+}
+
+iframe {
+    border: 10px solid #CCC;
+    border-radius: 20px;
+}
+
+.card {
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding:0px 0px 0px 10px;
+    margin-top:5px;
+    color: #fa0;
+    font-family: courier;
+    height: 65px;
+    width: 85%;
+    text-wrap: wrap;
 }
 
 .flex-v {
@@ -47,8 +115,12 @@ h4 {
 
 #sigma {
     border: 1px solid black;
-    width: 70%;
-    height: 75vh;
+    width: 80%;
+    height: 70vh;
+    border-radius: 10px;
+    padding:10px;
+    margin:0px;
+    margin-bottom: 10px;
 }
 
 /* The switch - the box around the slider */
@@ -114,4 +186,65 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+
+/*********** Baseline, reset styles ***********/
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 25rem;
+}
+
+/* Removes default focus */
+input[type="range"]:focus {
+  outline: none;
+}
+
+/******** Chrome, Safari, Opera and Edge Chromium styles ********/
+/* slider track */
+input[type="range"]::-webkit-slider-runnable-track {
+  background-color: #c4c4c4;
+  border-radius: 1rem;
+  height: 0.4rem;
+}
+
+/* slider thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  margin-top: -7.2px; /* Centers thumb on the track */
+  background-color: #ffaa00;
+  border-radius: 2rem;
+  height: 1.3rem;
+  width: 1.3rem;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+  outline: 3px solid #ffaa00;
+  outline-offset: 0.125rem;
+}
+
+/*********** Firefox styles ***********/
+/* slider track */
+input[type="range"]::-moz-range-track {
+  background-color: #c4c4c4;
+  border-radius: 1rem;
+  height: 0.4rem;
+}
+
+/* slider thumb */
+input[type="range"]::-moz-range-thumb {
+  background-color: #ffaa00;
+  border: none; /*Removes extra border that FF applies*/
+  border-radius: 2rem;
+  height: 1.3rem;
+  width: 1.3rem;
+}
+
+input[type="range"]:focus::-moz-range-thumb{
+  outline: 3px solid #ffaa00;
+  outline-offset: 0.125rem;
 }
