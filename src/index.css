@@ -97,6 +97,12 @@ a:hover {
 iframe {
     border: 10px solid #CCC;
     border-radius: 20px;
+    width: 98vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -49vw;
+    margin-right: -49vw;
 }
 
 .card {

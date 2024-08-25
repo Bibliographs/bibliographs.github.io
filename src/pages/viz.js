@@ -3,6 +3,7 @@ import { addMetadataGraph, generateRefGraph } from "@/lib/graph";
 import { pageStyle, saveAsPNG, saveGexf } from "@/lib/utils";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import Sigma from "sigma";
+import { EdgeLineProgram } from "sigma/rendering";
 import van from "vanjs-core";
 import { navigate } from "vanjs-routing";
 
@@ -64,8 +65,15 @@ const Viz = () => {
     });
     if (sigmaInstance) sigmaInstance.kill();
     sigmaInstance = new Sigma(graph.val, sigmaContainer, {
+      labelDensity: settings.labelDensity.value.rawVal,
+      labelRenderedSizeThreshold: settings.labelRenderThreshold.value.rawVal,
       itemSizesReference: "positions",
       zoomToSizeRatioFunction: (x) => x,
+      defaultEdgeColor: "rgba(204,204,204,0.82)",
+      defaultEdgeType: "thinline",
+      edgeProgramClasses: {
+        thinline: EdgeLineProgram,
+      },
     });
     layout.start();
     layoutRunning.val = true;
@@ -112,13 +120,13 @@ const Viz = () => {
       label: "Label size",
     },
     labelDensity: {
-      value: van.state(1),
+      value: van.state(2),
       min: 0,
       max: 10,
       label: "Label density",
     },
     labelRenderThreshold: {
-      value: van.state(6),
+      value: van.state(0),
       min: 0,
       max: 10,
       label: "Label render threshold",
