@@ -43,6 +43,14 @@ h5 {
 .grassetto {
     font-weight: bold;
     font-size: 4em;
+    margin-top:20px;
+    margin-bottom:0px;
+}
+
+.smaller {
+    font-size: 2em;
+    margin-top:0px;
+    margin-bottom:60px;
 }
 
 
