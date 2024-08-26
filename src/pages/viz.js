@@ -69,7 +69,7 @@ const Viz = () => {
       labelRenderedSizeThreshold: settings.labelRenderThreshold.value.rawVal,
       itemSizesReference: "positions",
       zoomToSizeRatioFunction: (x) => x,
-      defaultEdgeColor: "rgba(204,204,204,0.82)",
+      defaultEdgeColor: "rgba(204,204,204,0.85)",
       defaultEdgeType: "thinline",
       edgeProgramClasses: {
         thinline: EdgeLineProgram,
