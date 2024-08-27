@@ -20,7 +20,7 @@ export const fields = Object.keys(fieldColors);
 export const metadataFields = fields.filter((field) => field !== "refs");
 
 const maxRefNodeSize = 1800;
-const maxMetadataNodeSize = 4000;
+const maxMetadataNodeSize = 20000;
 
 export const generateRefGraphProgress = van.state(0);
 
