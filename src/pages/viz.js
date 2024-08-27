@@ -175,6 +175,9 @@ const Viz = () => {
   return main(
     { class: "c" },
     h1({ class: "center" }, "3. Visualize the Graph"),
+    p(
+        "Use the sliders to adjust the visualization: Step 1 calibrates the base-map network of references. Step 2 adjust the position of the metadata on the base-map"
+    ),
     div(
       { class: "flex-h", style: "justify-content: space-between" },
       sigmaContainer,
