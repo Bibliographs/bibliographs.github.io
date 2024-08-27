@@ -11,7 +11,6 @@ import Viz from "./pages/viz";
 
 function App() {
   return Router({
-    basename: window.IS_PRODUCTION ? "bibliograph2" : "",
     routes: [
       { path: "/", component: Start },
       { path: "/search", component: Search },
